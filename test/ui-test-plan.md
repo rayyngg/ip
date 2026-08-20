@@ -366,3 +366,150 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
   Bye. Hope to see you again soon!
   ____________________________________________________________
   ```
+
+### UI-009 — Delete a middle task and renumber the list (positive)
+
+- Aim: Verify that a completed todo and deadline remain correct when a middle event is deleted, and that later tasks are renumbered.
+- Command: `java -cp out TryBot`
+- Inputs:
+
+  ```text
+  todo read book
+  deadline return book /by June 6th
+  event project meeting /from Aug 6th 2pm /to 4pm
+  todo join sports club
+  todo borrow book
+  mark 1
+  mark 2
+  delete 3
+  list
+  bye
+  ```
+
+- Expected output:
+
+  ```text
+  ____________________________________________________________
+   _____             ____        _
+  |_   _| _ __ _   _ | __ )  ___ | |_
+    | |  | '__| | | ||  _ \ / _ \| __|
+    | |  | |  | |_| || |_) | (_) | |_
+    |_|  |_|   \__, ||____/ \___/ \__|
+                |___/
+  Hello! I'm TryBot.
+  What can I do for you?
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [T][ ] read book
+  Now you have 1 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [D][ ] return book (by: June 6th)
+  Now you have 2 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+  Now you have 3 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [T][ ] join sports club
+  Now you have 4 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [T][ ] borrow book
+  Now you have 5 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Good work!! I've marked this task as done:
+  [T][X] read book
+  ____________________________________________________________
+  ____________________________________________________________
+  Good work!! I've marked this task as done:
+  [D][X] return book (by: June 6th)
+  ____________________________________________________________
+  ____________________________________________________________
+  Noted. I've removed this task:
+  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+  Now you have 4 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Here are the tasks in your list:
+  1.[T][X] read book
+  2.[D][X] return book (by: June 6th)
+  3.[T][ ] join sports club
+  4.[T][ ] borrow book
+  ____________________________________________________________
+  ____________________________________________________________
+  Bye. Hope to see you again soon!
+  ____________________________________________________________
+  ```
+
+### UI-010 — Reject invalid delete commands without corrupting state (negative)
+
+- Aim: Verify that missing, non-numeric, zero, and out-of-range delete arguments leave a valid task intact, while a later valid delete removes it.
+- Command: `java -cp out TryBot`
+- Inputs:
+
+  ```text
+  todo keep task
+  delete
+  delete abc
+  delete 0
+  delete 2
+  list
+  delete 1
+  list
+  bye
+  ```
+
+- Expected output:
+
+  ```text
+  ____________________________________________________________
+   _____             ____        _
+  |_   _| _ __ _   _ | __ )  ___ | |_
+    | |  | '__| | | ||  _ \ / _ \| __|
+    | |  | |  | |_| || |_) | (_) | |_
+    |_|  |_|   \__, ||____/ \___/ \__|
+                |___/
+  Hello! I'm TryBot.
+  What can I do for you?
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [T][ ] keep task
+  Now you have 1 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Delete needs one task number. Example: delete 1.
+  ____________________________________________________________
+  ____________________________________________________________
+  The task number must be a whole number. Example: delete 1.
+  ____________________________________________________________
+  ____________________________________________________________
+  That task number does not exist. Use list to see your task numbers.
+  ____________________________________________________________
+  ____________________________________________________________
+  That task number does not exist. Use list to see your task numbers.
+  ____________________________________________________________
+  ____________________________________________________________
+  Here are the tasks in your list:
+  1.[T][ ] keep task
+  ____________________________________________________________
+  ____________________________________________________________
+  Noted. I've removed this task:
+  [T][ ] keep task
+  Now you have 0 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Here are the tasks in your list:
+  ____________________________________________________________
+  ____________________________________________________________
+  Bye. Hope to see you again soon!
+  ____________________________________________________________
+  ```

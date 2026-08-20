@@ -1,10 +1,11 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
  * A simple chatbot that stores tasks until the user says goodbye.
  */
 public class TryBot {
-    private static final int MAX_TASKS = 100;
     private static final String SEPARATOR = "____________________________________________________________";
 
     public static void main(String[] args) {
@@ -15,8 +16,7 @@ public class TryBot {
                 + "  |_|  |_|   \\__, ||____/ \\___/ \\__|\n"
                 + "              |___/\n";
 
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        List<Task> tasks = new ArrayList<>();
 
         System.out.println(SEPARATOR);
         System.out.print(banner);
@@ -42,21 +42,23 @@ public class TryBot {
                 }
 
                 if (trimmedCommand.equalsIgnoreCase("list")) {
-                    printTaskList(tasks, taskCount);
+                    printTaskList(tasks);
                 } else if (isMarkCommand(trimmedCommand)) {
-                    markTaskAsDone(trimmedCommand, tasks, taskCount);
+                    markTaskAsDone(trimmedCommand, tasks);
                 } else if (isUnmarkCommand(trimmedCommand)) {
-                    unmarkTask(trimmedCommand, tasks, taskCount);
+                    unmarkTask(trimmedCommand, tasks);
+                } else if (isDeleteCommand(trimmedCommand)) {
+                    deleteTask(trimmedCommand, tasks);
                 } else if (isTodoCommand(trimmedCommand)) {
                     String description = getCommandBody(trimmedCommand, "todo");
                     if (description.isEmpty()) {
                         throw new TryBotException("A todo needs a description. Try: todo read book.");
                     }
-                    taskCount = addTask(new Todo(description), tasks, taskCount);
+                    addTask(new Todo(description), tasks);
                 } else if (isDeadlineCommand(trimmedCommand)) {
-                    taskCount = addDeadlineTask(trimmedCommand, tasks, taskCount);
+                    addDeadlineTask(trimmedCommand, tasks);
                 } else if (isEventCommand(trimmedCommand)) {
-                    taskCount = addEventTask(trimmedCommand, tasks, taskCount);
+                    addEventTask(trimmedCommand, tasks);
                 } else {
                     throw new TryBotException("I do not recognise that command. Try todo, list, or bye.");
                 }
@@ -88,6 +90,17 @@ public class TryBot {
     private static boolean isUnmarkCommand(String command) {
         String[] commandParts = command.split("\\s+");
         return commandParts.length > 0 && commandParts[0].equalsIgnoreCase("unmark");
+    }
+
+    /**
+     * Checks whether a command starts with the delete keyword.
+     *
+     * @param command trimmed user command
+     * @return true when the first command word is delete
+     */
+    private static boolean isDeleteCommand(String command) {
+        String[] commandParts = command.split("\\s+");
+        return commandParts.length > 0 && commandParts[0].equalsIgnoreCase("delete");
     }
 
     /**
@@ -143,10 +156,9 @@ public class TryBot {
      *
      * @param command trimmed deadline command
      * @param tasks tasks currently stored by TryBot
-     * @param taskCount number of stored tasks
-     * @return updated number of stored tasks
+     * @throws TryBotException if the deadline format is invalid
      */
-    private static int addDeadlineTask(String command, Task[] tasks, int taskCount) throws TryBotException {
+    private static void addDeadlineTask(String command, List<Task> tasks) throws TryBotException {
         int byIndex = command.toLowerCase().indexOf("/by");
         if (byIndex < 0) {
             throw new TryBotException("A deadline needs /by followed by a date or time. Example: deadline report /by Friday.");
@@ -158,7 +170,7 @@ public class TryBot {
             throw new TryBotException("A deadline needs both a description and a date or time. Example: deadline report /by Friday.");
         }
 
-        return addTask(new Deadline(description, by), tasks, taskCount);
+        addTask(new Deadline(description, by), tasks);
     }
 
     /**
@@ -166,10 +178,9 @@ public class TryBot {
      *
      * @param command trimmed event command
      * @param tasks tasks currently stored by TryBot
-     * @param taskCount number of stored tasks
-     * @return updated number of stored tasks
+     * @throws TryBotException if the event format is invalid
      */
-    private static int addEventTask(String command, Task[] tasks, int taskCount) throws TryBotException {
+    private static void addEventTask(String command, List<Task> tasks) throws TryBotException {
         String lowerCaseCommand = command.toLowerCase();
         int fromIndex = lowerCaseCommand.indexOf("/from");
         int toIndex = lowerCaseCommand.indexOf("/to", fromIndex + "/from".length());
@@ -184,7 +195,7 @@ public class TryBot {
             throw new TryBotException("An event needs a description, start time, and end time. Example: event meeting /from Monday /to Tuesday.");
         }
 
-        return addTask(new Event(description, from, to), tasks, taskCount);
+        addTask(new Event(description, from, to), tasks);
     }
 
     /**
@@ -192,32 +203,23 @@ public class TryBot {
      *
      * @param task task to add
      * @param tasks tasks currently stored by TryBot
-     * @param taskCount number of stored tasks
-     * @return updated number of stored tasks
      */
-    private static int addTask(Task task, Task[] tasks, int taskCount) throws TryBotException {
-        if (taskCount >= MAX_TASKS) {
-            throw new TryBotException("I cannot add another task because your task list is full.");
-        }
-
-        tasks[taskCount] = task;
-        int updatedTaskCount = taskCount + 1;
+    private static void addTask(Task task, List<Task> tasks) {
+        tasks.add(task);
         System.out.println("Got it. I've added this task:");
         System.out.println(task);
-        System.out.println("Now you have " + updatedTaskCount + " tasks in the list.");
-        return updatedTaskCount;
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
     }
 
     /**
      * Prints every task together with its completion status.
      *
      * @param tasks tasks currently stored by TryBot
-     * @param taskCount number of stored tasks
      */
-    private static void printTaskList(Task[] tasks, int taskCount) {
+    private static void printTaskList(List<Task> tasks) {
         System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < taskCount; i++) {
-            System.out.println((i + 1) + "." + tasks[i]);
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println((i + 1) + "." + tasks.get(i));
         }
     }
 
@@ -226,9 +228,9 @@ public class TryBot {
      *
      * @param command trimmed user command
      * @param tasks tasks currently stored by TryBot
-     * @param taskCount number of stored tasks
+     * @throws TryBotException if the command has no valid task number
      */
-    private static void markTaskAsDone(String command, Task[] tasks, int taskCount) throws TryBotException {
+    private static void markTaskAsDone(String command, List<Task> tasks) throws TryBotException {
         String[] commandParts = command.split("\\s+");
         if (commandParts.length != 2) {
             throw new TryBotException("Mark needs one task number. Example: mark 1.");
@@ -241,14 +243,14 @@ public class TryBot {
             throw new TryBotException("The task number must be a whole number. Example: mark 1.");
         }
 
-        if (taskNumber < 1 || taskNumber > taskCount) {
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
             throw new TryBotException("That task number does not exist. Use list to see your task numbers.");
         }
 
         int taskIndex = taskNumber - 1;
-        tasks[taskIndex].markAsDone();
+        tasks.get(taskIndex).markAsDone();
         System.out.println("Good work!! I've marked this task as done:");
-        System.out.println(tasks[taskIndex]);
+        System.out.println(tasks.get(taskIndex));
     }
 
     /**
@@ -256,9 +258,9 @@ public class TryBot {
      *
      * @param command trimmed user command
      * @param tasks tasks currently stored by TryBot
-     * @param taskCount number of stored tasks
+     * @throws TryBotException if the command has no valid task number
      */
-    private static void unmarkTask(String command, Task[] tasks, int taskCount) throws TryBotException {
+    private static void unmarkTask(String command, List<Task> tasks) throws TryBotException {
         String[] commandParts = command.split("\\s+");
         if (commandParts.length != 2) {
             throw new TryBotException("Unmark needs one task number. Example: unmark 1.");
@@ -271,13 +273,43 @@ public class TryBot {
             throw new TryBotException("The task number must be a whole number. Example: unmark 1.");
         }
 
-        if (taskNumber < 1 || taskNumber > taskCount) {
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
             throw new TryBotException("That task number does not exist. Use list to see your task numbers.");
         }
 
         int taskIndex = taskNumber - 1;
-        tasks[taskIndex].markAsNotDone();
+        tasks.get(taskIndex).markAsNotDone();
         System.out.println("OK, I've marked this task as not done yet:");
-        System.out.println(tasks[taskIndex]);
+        System.out.println(tasks.get(taskIndex));
+    }
+
+    /**
+     * Deletes the task number supplied in a delete command.
+     *
+     * @param command trimmed user command
+     * @param tasks tasks currently stored by TryBot
+     * @throws TryBotException if the command has no valid task number
+     */
+    private static void deleteTask(String command, List<Task> tasks) throws TryBotException {
+        String[] commandParts = command.split("\\s+");
+        if (commandParts.length != 2) {
+            throw new TryBotException("Delete needs one task number. Example: delete 1.");
+        }
+
+        int taskNumber;
+        try {
+            taskNumber = Integer.parseInt(commandParts[1]);
+        } catch (NumberFormatException exception) {
+            throw new TryBotException("The task number must be a whole number. Example: delete 1.");
+        }
+
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
+            throw new TryBotException("That task number does not exist. Use list to see your task numbers.");
+        }
+
+        Task removedTask = tasks.remove(taskNumber - 1);
+        System.out.println("Noted. I've removed this task:");
+        System.out.println(removedTask);
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
     }
 }
