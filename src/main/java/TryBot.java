@@ -42,6 +42,17 @@ public class TryBot {
                 markTaskAsDone(trimmedCommand, tasks, taskCount);
             } else if (isUnmarkCommand(trimmedCommand)) {
                 unmarkTask(trimmedCommand, tasks, taskCount);
+            } else if (isTodoCommand(trimmedCommand)) {
+                String description = getTodoDescription(trimmedCommand);
+                if (description.isEmpty()) {
+                    System.out.println("A todo needs a description.");
+                } else {
+                    taskCount = addTask(new Todo(description), tasks, taskCount);
+                }
+            } else if (isDeadlineCommand(trimmedCommand)) {
+                taskCount = addDeadlineTask(trimmedCommand, tasks, taskCount);
+            } else if (isEventCommand(trimmedCommand)) {
+                taskCount = addEventTask(trimmedCommand, tasks, taskCount);
             } else if (taskCount < MAX_TASKS) {
                 tasks[taskCount] = new Task(command);
                 taskCount++;
@@ -74,6 +85,124 @@ public class TryBot {
     private static boolean isUnmarkCommand(String command) {
         String[] commandParts = command.split("\\s+");
         return commandParts.length > 0 && commandParts[0].equalsIgnoreCase("unmark");
+    }
+
+    /**
+     * Checks whether a command starts with the todo keyword.
+     *
+     * @param command trimmed user command
+     * @return true when the first command word is todo
+     */
+    private static boolean isTodoCommand(String command) {
+        String[] commandParts = command.split("\\s+");
+        return commandParts.length > 0 && (commandParts[0].equalsIgnoreCase("todo") || commandParts[0].equalsIgnoreCase("todo:"));
+    }
+
+    /**
+     * Checks whether a command starts with the deadline keyword.
+     *
+     * @param command trimmed user command
+     * @return true when the first command word is deadline
+     */
+    private static boolean isDeadlineCommand(String command) {
+        String[] commandParts = command.split("\\s+");
+        return commandParts.length > 0 && (commandParts[0].equalsIgnoreCase("deadline") ||  commandParts[0].equalsIgnoreCase("deadline:"));
+    }
+
+    /**
+     * Checks whether a command starts with the event keyword.
+     *
+     * @param command trimmed user command
+     * @return true when the first command word is event
+     */
+    private static boolean isEventCommand(String command) {
+        String[] commandParts = command.split("\\s+");
+        return commandParts.length > 0 && (commandParts[0].equalsIgnoreCase("event") || commandParts[0].equalsIgnoreCase("event:"));
+    }
+
+    /**
+     * Extracts the description from a todo command.
+     *
+     * @param command trimmed todo command
+     * @return todo description
+     */
+    private static String getTodoDescription(String command) {
+        return command.substring("todo".length()).trim();
+    }
+
+    /**
+     * Parses and adds a deadline command.
+     *
+     * @param command trimmed deadline command
+     * @param tasks tasks currently stored by TryBot
+     * @param taskCount number of stored tasks
+     * @return updated number of stored tasks
+     */
+    private static int addDeadlineTask(String command, Task[] tasks, int taskCount) {
+        int byIndex = command.toLowerCase().indexOf("/by");
+        if (byIndex < 0) {
+            System.out.println("A deadline must include /by followed by a date or time.");
+            return taskCount;
+        }
+
+        String description = command.substring("deadline".length(), byIndex).trim();
+        String by = command.substring(byIndex + "/by".length()).trim();
+        if (description.isEmpty() || by.isEmpty()) {
+            System.out.println("A deadline needs both a description and a date or time.");
+            return taskCount;
+        }
+
+        return addTask(new Deadline(description, by), tasks, taskCount);
+    }
+
+    /**
+     * Parses and adds an event command.
+     *
+     * @param command trimmed event command
+     * @param tasks tasks currently stored by TryBot
+     * @param taskCount number of stored tasks
+     * @return updated number of stored tasks
+     */
+    private static int addEventTask(String command, Task[] tasks, int taskCount) {
+        String lowerCaseCommand = command.toLowerCase();
+        int fromIndex = lowerCaseCommand.indexOf("/from");
+        int toIndex = lowerCaseCommand.indexOf("/to", fromIndex + "/from".length());
+        if (fromIndex < 0 || toIndex < 0) {
+            System.out.println("An event must include /from and /to followed by date or time details.");
+            return taskCount;
+        }
+
+        String description = command.substring("event".length(), fromIndex).trim();
+        String from = command.substring(fromIndex + "/from".length(), toIndex).trim();
+        String to = command.substring(toIndex + "/to".length()).trim();
+        if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
+            System.out.println("An event needs a description, start time, and end time.");
+            return taskCount;
+        }
+
+        return addTask(new Event(description, from, to), tasks, taskCount);
+    }
+
+    /**
+     * Adds a task and prints the standard confirmation message.
+     *
+     * @param task task to add
+     * @param tasks tasks currently stored by TryBot
+     * @param taskCount number of stored tasks
+     * @return updated number of stored tasks
+     */
+    private static int addTask(Task task, Task[] tasks, int taskCount) {
+        if (taskCount >= MAX_TASKS) {
+            System.out.println("Sorry, your task list is full.");
+            return taskCount;
+        }
+
+        tasks[taskCount] = task;
+        int updatedTaskCount = taskCount + 1;
+        System.out.println("Got it. I've added this task:");
+        System.out.println(task);
+        System.out.println("Now you have " + updatedTaskCount + " tasks in the list.");
+        return updatedTaskCount;
     }
 
     /**
