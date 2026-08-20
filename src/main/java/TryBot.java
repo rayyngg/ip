@@ -16,6 +16,7 @@ public class TryBot {
                 + "              |___/\n";
 
         String[] tasks = new String[MAX_TASKS];
+        boolean[] completedTasks = new boolean[MAX_TASKS];
         int taskCount = 0;
 
         System.out.println(SEPARATOR);
@@ -27,26 +28,89 @@ public class TryBot {
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
+            String trimmedCommand = command.trim();
             System.out.println(SEPARATOR);
 
-            if (command.equalsIgnoreCase("bye") || command.equalsIgnoreCase("bye!")) {
+            if (trimmedCommand.equalsIgnoreCase("bye") || trimmedCommand.equalsIgnoreCase("bye!")) {
                 System.out.println("Bye. Hope to see you again soon!");
                 System.out.println(SEPARATOR);
                 break;
             }
 
-            if (command.equalsIgnoreCase("list")) {
-                for (int i = 0; i < taskCount; i++) {
-                    System.out.println("Here is your list:");
-                    System.out.println((i + 1) + ". " + tasks[i]);
-                }
-            } else {
+            if (trimmedCommand.equalsIgnoreCase("list")) {
+                printTaskList(tasks, completedTasks, taskCount);
+            } else if (isMarkCommand(trimmedCommand)) {
+                markTaskAsDone(trimmedCommand, tasks, completedTasks, taskCount);
+            } else if (taskCount < MAX_TASKS) {
                 tasks[taskCount] = command;
                 taskCount++;
                 System.out.println("TryBot has added the task: " + command);
+            } else {
+                System.out.println("Sorry, your task list is full.");
             }
 
             System.out.println(SEPARATOR);
         }
+    }
+
+    /**
+     * Checks whether a command starts with the mark keyword.
+     *
+     * @param command trimmed user command
+     * @return true when the first command word is mark
+     */
+    private static boolean isMarkCommand(String command) {
+        String[] commandParts = command.split("\\s+");
+        return commandParts.length > 0 && commandParts[0].equalsIgnoreCase("mark");
+    }
+
+    /**
+     * Prints every task together with its completion status.
+     *
+     * @param tasks tasks currently stored by TryBot
+     * @param completedTasks completion status for each stored task
+     * @param taskCount number of stored tasks
+     */
+    private static void printTaskList(String[] tasks, boolean[] completedTasks, int taskCount) {
+        System.out.println("Here are the tasks in your list:");
+        for (int i = 0; i < taskCount; i++) {
+            String status = completedTasks[i] ? "X" : " ";
+            System.out.println((i + 1) + ".[" + status + "] " + tasks[i]);
+        }
+    }
+
+    /**
+     * Marks the task number in a mark command as done.
+     *
+     * @param command trimmed user command
+     * @param tasks tasks currently stored by TryBot
+     * @param completedTasks completion status for each stored task
+     * @param taskCount number of stored tasks
+     */
+    private static void markTaskAsDone(String command, String[] tasks, boolean[] completedTasks,
+                                       int taskCount) {
+        String[] commandParts = command.split("\\s+");
+        if (commandParts.length != 2) {
+            System.out.println("Maybe try telling me a number?");
+            return;
+        }
+
+        int taskNumber;
+        try {
+            taskNumber = Integer.parseInt(commandParts[1]);
+        } catch (NumberFormatException exception) {
+            System.out.println("Maybe try telling me a number?");
+            return;
+        }
+
+        if (taskNumber < 1 || taskNumber > taskCount) {
+            System.out.println("Hmm. That task number does not seem to exist.");
+            return;
+        }
+
+        int taskIndex = taskNumber - 1;
+        completedTasks[taskIndex] = true;
+        System.out.println("Good work!! I've marked this task as done:");
+        System.out.println("[X] " + tasks[taskIndex]);
     }
 }
