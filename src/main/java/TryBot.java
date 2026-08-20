@@ -15,8 +15,7 @@ public class TryBot {
                 + "  |_|  |_|   \\__, ||____/ \\___/ \\__|\n"
                 + "              |___/\n";
 
-        String[] tasks = new String[MAX_TASKS];
-        boolean[] completedTasks = new boolean[MAX_TASKS];
+        Task[] tasks = new Task[MAX_TASKS];
         int taskCount = 0;
 
         System.out.println(SEPARATOR);
@@ -38,11 +37,13 @@ public class TryBot {
             }
 
             if (trimmedCommand.equalsIgnoreCase("list")) {
-                printTaskList(tasks, completedTasks, taskCount);
+                printTaskList(tasks, taskCount);
             } else if (isMarkCommand(trimmedCommand)) {
-                markTaskAsDone(trimmedCommand, tasks, completedTasks, taskCount);
+                markTaskAsDone(trimmedCommand, tasks, taskCount);
+            } else if (isUnmarkCommand(trimmedCommand)) {
+                unmarkTask(trimmedCommand, tasks, taskCount);
             } else if (taskCount < MAX_TASKS) {
-                tasks[taskCount] = command;
+                tasks[taskCount] = new Task(command);
                 taskCount++;
                 System.out.println("TryBot has added the task: " + command);
             } else {
@@ -65,17 +66,26 @@ public class TryBot {
     }
 
     /**
+     * Checks whether a command starts with the unmark keyword.
+     *
+     * @param command trimmed user command
+     * @return true when the first command word is unmark
+     */
+    private static boolean isUnmarkCommand(String command) {
+        String[] commandParts = command.split("\\s+");
+        return commandParts.length > 0 && commandParts[0].equalsIgnoreCase("unmark");
+    }
+
+    /**
      * Prints every task together with its completion status.
      *
      * @param tasks tasks currently stored by TryBot
-     * @param completedTasks completion status for each stored task
      * @param taskCount number of stored tasks
      */
-    private static void printTaskList(String[] tasks, boolean[] completedTasks, int taskCount) {
+    private static void printTaskList(Task[] tasks, int taskCount) {
         System.out.println("Here are the tasks in your list:");
         for (int i = 0; i < taskCount; i++) {
-            String status = completedTasks[i] ? "X" : " ";
-            System.out.println((i + 1) + ".[" + status + "] " + tasks[i]);
+            System.out.println((i + 1) + "." + tasks[i]);
         }
     }
 
@@ -84,11 +94,9 @@ public class TryBot {
      *
      * @param command trimmed user command
      * @param tasks tasks currently stored by TryBot
-     * @param completedTasks completion status for each stored task
      * @param taskCount number of stored tasks
      */
-    private static void markTaskAsDone(String command, String[] tasks, boolean[] completedTasks,
-                                       int taskCount) {
+    private static void markTaskAsDone(String command, Task[] tasks, int taskCount) {
         String[] commandParts = command.split("\\s+");
         if (commandParts.length != 2) {
             System.out.println("Maybe try telling me a number?");
@@ -109,8 +117,41 @@ public class TryBot {
         }
 
         int taskIndex = taskNumber - 1;
-        completedTasks[taskIndex] = true;
+        tasks[taskIndex].markAsDone();
         System.out.println("Good work!! I've marked this task as done:");
-        System.out.println("[X] " + tasks[taskIndex]);
+        System.out.println(tasks[taskIndex]);
+    }
+
+    /**
+     * Reverses the done status of the task number in an unmark command.
+     *
+     * @param command trimmed user command
+     * @param tasks tasks currently stored by TryBot
+     * @param taskCount number of stored tasks
+     */
+    private static void unmarkTask(String command, Task[] tasks, int taskCount) {
+        String[] commandParts = command.split("\\s+");
+        if (commandParts.length != 2) {
+            System.out.println("Maybe try telling me a number?");
+            return;
+        }
+
+        int taskNumber;
+        try {
+            taskNumber = Integer.parseInt(commandParts[1]);
+        } catch (NumberFormatException exception) {
+            System.out.println("Maybe try telling me a number?");
+            return;
+        }
+
+        if (taskNumber < 1 || taskNumber > taskCount) {
+            System.out.println("Hmm. That task number does not seem to exist.");
+            return;
+        }
+
+        int taskIndex = taskNumber - 1;
+        tasks[taskIndex].markAsNotDone();
+        System.out.println("OK, I've marked this task as not done yet:");
+        System.out.println(tasks[taskIndex]);
     }
 }
