@@ -24,6 +24,14 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 # Project-specific requirements
 
+## Code-update validation
+
+After every code update:
+
+1. Review `test/ui-test-plan.md` and add or update test cases, inputs, or expected outputs when the change affects the console UI. If the plan remains accurate, no test-plan edit is needed.
+2. Invoke the project-specific `$test-ui` skill from the repository root, using the test plan as the source of truth.
+3. Report the test session result and console transcript. The session must stop at the first failed test.
+
 ## Java version:
 
 Ensure that Java 25 is used when running the application or build tasks. On macOS, use `sdk use java 25.0.3.fx-zulu` to switch to Java 25 if needed.
