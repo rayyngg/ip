@@ -1,3 +1,5 @@
+package trybot.task;
+
 /**
  * A task without an attached date or time.
  */

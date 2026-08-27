@@ -1,4 +1,13 @@
+package trybot;
+
 import java.io.IOException;
+
+import trybot.command.Command;
+import trybot.exception.TryBotException;
+import trybot.parser.Parser;
+import trybot.storage.Storage;
+import trybot.task.TaskList;
+import trybot.ui.Ui;
 
 /**
  * Coordinates TryBot's user interface, parser, task list, and storage.

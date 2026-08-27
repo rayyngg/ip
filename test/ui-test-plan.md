@@ -6,8 +6,8 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 
 - Working directory: repository root
 - Java requirement: Java 25
-- Setup command: `javac -d out src/main/java/*.java`
-- Program command: `java -cp out TryBot`
+- Setup command: `javac -d out (Get-ChildItem -Recurse src/main/java -Filter *.java | Select-Object -ExpandProperty FullName)`
+- Program command: `java -cp out trybot.TryBot`
 - Output comparison: exact, with CRLF normalized to LF and the final newline treated as optional
 - Execution order: top to bottom; positive and negative cases are intentionally interleaved; stop immediately after the first failure
 - Per-case setup: remove `data/trybot.txt` before each case so cases do not share persisted state. UI-012 then creates its own fixture after this reset.
@@ -17,7 +17,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-001 — Start TryBot and exit (positive)
 
 - Aim: Verify that TryBot starts with the expected welcome screen and exits when the user enters `bye`.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -45,7 +45,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-002 — Reject invalid commands without adding tasks (negative)
 
 - Aim: Verify that a missing todo description and an unknown command show errors, while `list` confirms that no task was added.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -85,7 +85,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-003 — Complete a todo lifecycle (positive)
 
 - Aim: Verify that a valid todo can be added, marked done, listed as done, unmarked, and listed as not done again.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -139,7 +139,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-004 — Reject malformed structured commands (negative)
 
 - Aim: Verify that malformed deadline, event, and mark commands produce actionable messages and leave the task list empty.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -183,7 +183,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-005 — Add deadline and event tasks (positive)
 
 - Aim: Verify that valid deadline and event inputs create the correct task types and preserve their details in the list.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -229,7 +229,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-005A — Parse numeric dates and times (positive)
 
 - Aim: Verify that numeric dates and times are parsed into typed date-times and displayed in a different human-readable format for deadlines and events.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -275,7 +275,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-005B — Reject invalid numeric dates and event ranges (negative)
 
 - Aim: Verify that impossible dates, invalid times, and events whose end is before their start are rejected without adding tasks.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -319,7 +319,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-006 — Preserve valid state after invalid inputs (negative)
 
 - Aim: Verify that malformed deadline/event commands and invalid mark/unmark arguments do not alter an already valid todo.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -374,7 +374,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-007 — Accept whitespace and case variations (positive)
 
 - Aim: Verify that command matching is case-insensitive, surrounding whitespace is ignored, and the todo description is trimmed.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -413,7 +413,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-008 — Reject empty and boundary inputs (negative)
 
 - Aim: Verify that blank input, zero-based task numbers, out-of-range task numbers, and an empty `todo:` do not create a task.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -461,7 +461,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-009 — Delete a middle task and renumber the list (positive)
 
 - Aim: Verify that a completed todo and deadline remain correct when a middle event is deleted, and that later tasks are renumbered.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -543,7 +543,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-010 — Reject invalid delete commands without corrupting state (negative)
 
 - Aim: Verify that missing, non-numeric, zero, and out-of-range delete arguments leave a valid task intact, while a later valid delete removes it.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -608,7 +608,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 ### UI-011 — Save task changes to disk (positive)
 
 - Aim: Verify that adding, completing, uncompleting, and deleting tasks still produce the expected confirmations while each successful task-list change is saved.
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -661,7 +661,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 
 - Aim: Verify that blank and malformed records are ignored while valid escaped todo, deadline, and event records are loaded with their statuses and details intact.
 - Setup command: `Set-Content -Path data/trybot.txt -Value @('', 'not a task record', 'T | 2 | invalid status', 'D | 0 | missing date', 'E | 1 | missing end | Monday', 'T | 1 | loaded \| pipe', 'D | 0 | loaded deadline | Friday', 'E | 1 | loaded event | Monday | Tuesday')`
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text
@@ -697,7 +697,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 
 - Aim: Verify that TryBot restores todo, deadline, and event tasks with their completion states from the task data file before processing the first command.
 - Setup command: `Set-Content -Path data/trybot.txt -Value @('T | 1 | loaded todo', 'D | 0 | loaded deadline | Friday', 'E | 1 | loaded event | Monday | Tuesday')`
-- Command: `java -cp out TryBot`
+- Command: `java -cp out trybot.TryBot`
 - Inputs:
 
   ```text

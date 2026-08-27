@@ -1,3 +1,11 @@
+package trybot.command;
+
+import trybot.exception.TryBotException;
+import trybot.storage.Storage;
+import trybot.task.Task;
+import trybot.task.TaskList;
+import trybot.ui.Ui;
+
 /**
  * Deletes one task from the task list.
  */

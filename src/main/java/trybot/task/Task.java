@@ -1,3 +1,5 @@
+package trybot.task;
+
 /**
  * Represents a task stored by TryBot.
  */

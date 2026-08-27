@@ -1,3 +1,5 @@
+package trybot.storage;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -8,6 +10,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import trybot.task.Deadline;
+import trybot.task.Event;
+import trybot.task.Task;
+import trybot.task.Todo;
 
 /**
  * Saves TryBot's task list to a file on disk.

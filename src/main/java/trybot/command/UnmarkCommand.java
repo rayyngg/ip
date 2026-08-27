@@ -1,15 +1,23 @@
+package trybot.command;
+
+import trybot.exception.TryBotException;
+import trybot.storage.Storage;
+import trybot.task.Task;
+import trybot.task.TaskList;
+import trybot.ui.Ui;
+
 /**
- * Marks one task as done.
+ * Marks one task as not done.
  */
-public class MarkCommand extends Command {
+public class UnmarkCommand extends Command {
     private final int taskNumber;
 
     /**
-     * Creates a mark command.
+     * Creates an unmark command.
      *
      * @param taskNumber one-based task number
      */
-    public MarkCommand(int taskNumber) {
+    public UnmarkCommand(int taskNumber) {
         this.taskNumber = taskNumber;
     }
 
@@ -20,9 +28,9 @@ public class MarkCommand extends Command {
         }
 
         Task task = tasks.get(taskNumber - 1);
-        task.markAsDone();
+        task.markAsNotDone();
         saveTasks(tasks, ui, storage);
-        ui.showTaskMarkedDone(task);
+        ui.showTaskMarkedNotDone(task);
     }
 
     @Override

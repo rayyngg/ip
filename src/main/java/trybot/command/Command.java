@@ -1,3 +1,10 @@
+package trybot.command;
+
+import trybot.exception.TryBotException;
+import trybot.storage.Storage;
+import trybot.task.TaskList;
+import trybot.ui.Ui;
+
 /**
  * Represents one executable TryBot command.
  */

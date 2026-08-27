@@ -1,3 +1,10 @@
+package trybot.command;
+
+import trybot.exception.TryBotException;
+import trybot.parser.Parser;
+import trybot.task.Deadline;
+import trybot.task.Task;
+
 /**
  * Adds a deadline task.
  */

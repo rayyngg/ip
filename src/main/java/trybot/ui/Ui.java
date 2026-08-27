@@ -1,4 +1,9 @@
+package trybot.ui;
+
 import java.util.Scanner;
+
+import trybot.task.Task;
+import trybot.task.TaskList;
 
 /**
  * Handles all console interactions with the TryBot user.

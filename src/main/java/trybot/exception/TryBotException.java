@@ -1,3 +1,5 @@
+package trybot.exception;
+
 /**
  * Represents an input or task-management error reported by TryBot.
  */

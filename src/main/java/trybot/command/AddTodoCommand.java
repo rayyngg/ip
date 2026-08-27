@@ -1,3 +1,9 @@
+package trybot.command;
+
+import trybot.exception.TryBotException;
+import trybot.task.Task;
+import trybot.task.Todo;
+
 /**
  * Adds a todo task.
  */

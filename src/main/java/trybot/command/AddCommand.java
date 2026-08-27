@@ -1,3 +1,11 @@
+package trybot.command;
+
+import trybot.exception.TryBotException;
+import trybot.storage.Storage;
+import trybot.task.Task;
+import trybot.task.TaskList;
+import trybot.ui.Ui;
+
 /**
  * Base class for commands that create and add one task.
  */
