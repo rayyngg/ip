@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -16,7 +17,7 @@ public class TryBot {
                 + "  |_|  |_|   \\__, ||____/ \\___/ \\__|\n"
                 + "              |___/\n";
 
-        List<Task> tasks = new ArrayList<>();
+        List<Task> tasks = loadTasks();
 
         System.out.println(SEPARATOR);
         System.out.print(banner);
@@ -206,6 +207,7 @@ public class TryBot {
      */
     private static void addTask(Task task, List<Task> tasks) {
         tasks.add(task);
+        saveTasks(tasks);
         System.out.println("Got it. I've added this task:");
         System.out.println(task);
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
@@ -249,6 +251,7 @@ public class TryBot {
 
         int taskIndex = taskNumber - 1;
         tasks.get(taskIndex).markAsDone();
+        saveTasks(tasks);
         System.out.println("Good work!! I've marked this task as done:");
         System.out.println(tasks.get(taskIndex));
     }
@@ -279,6 +282,7 @@ public class TryBot {
 
         int taskIndex = taskNumber - 1;
         tasks.get(taskIndex).markAsNotDone();
+        saveTasks(tasks);
         System.out.println("OK, I've marked this task as not done yet:");
         System.out.println(tasks.get(taskIndex));
     }
@@ -308,8 +312,38 @@ public class TryBot {
         }
 
         Task removedTask = tasks.remove(taskNumber - 1);
+        saveTasks(tasks);
         System.out.println("Noted. I've removed this task:");
         System.out.println(removedTask);
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    /**
+     * Saves the current task list and turns file-system failures into a clear program error.
+     *
+     * @param tasks tasks currently stored by TryBot
+     */
+    private static void saveTasks(List<Task> tasks) {
+        try {
+            Storage.saveTasks(tasks);
+        } catch (IOException exception) {
+            System.err.println("Warning: TryBot could not save the task list. "
+                    + "Your changes will be lost when TryBot exits.");
+        }
+    }
+
+    /**
+     * Loads the task list when TryBot starts.
+     *
+     * @return tasks saved by an earlier TryBot session
+     */
+    private static List<Task> loadTasks() {
+        try {
+            return Storage.loadTasks();
+        } catch (IOException exception) {
+            System.err.println("Warning: TryBot could not load the saved task list. "
+                    + "Starting with an empty list.");
+            return new ArrayList<>();
+        }
     }
 }
