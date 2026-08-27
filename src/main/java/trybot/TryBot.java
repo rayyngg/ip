@@ -28,7 +28,7 @@ public class TryBot {
     /**
      * Creates TryBot using the specified task data file.
      *
-     * @param filePath path to the task data file
+     * @param filePath path to the task data file.
      */
     public TryBot(String filePath) {
         ui = new Ui();
@@ -70,7 +70,7 @@ public class TryBot {
     /**
      * Starts TryBot with its default task file.
      *
-     * @param args command-line arguments, currently unused
+     * @param args command-line arguments, currently unused.
      */
     public static void main(String[] args) {
         new TryBot().run();

@@ -9,7 +9,6 @@ import trybot.task.TaskList;
  * Handles all console interactions with the TryBot user.
  */
 public class Ui {
-    private final Scanner scanner = new Scanner(System.in);
     private static final String SEPARATOR = "____________________________________________________________";
     private static final String BANNER = " _____             ____        _\n"
             + "|_   _| _ __ _   _ | __ )  ___ | |_\n"
@@ -17,6 +16,7 @@ public class Ui {
             + "  | |  | |  | |_| || |_) | (_) | |_\n"
             + "  |_|  |_|   \\__, ||____/ \\___/ \\__|\n"
             + "              |___/\n";
+    private final Scanner scanner = new Scanner(System.in);
 
     /**
      * Displays TryBot's welcome message.
@@ -74,7 +74,7 @@ public class Ui {
     /**
      * Displays an input or task-management error.
      *
-     * @param message user-friendly error message
+     * @param message user-friendly error message.
      */
     public void showError(String message) {
         System.out.println(message);
@@ -83,8 +83,8 @@ public class Ui {
     /**
      * Displays a confirmation after adding a task.
      *
-     * @param task task that was added
-     * @param taskCount number of tasks after the addition
+     * @param task task that was added.
+     * @param taskCount number of tasks after the addition.
      */
     public void showTaskAdded(Task task, int taskCount) {
         System.out.println("Got it. I've added this task:");
@@ -95,7 +95,7 @@ public class Ui {
     /**
      * Displays all tasks in their current list order.
      *
-     * @param tasks tasks to display
+     * @param tasks tasks to display.
      */
     public void showTaskList(TaskList tasks) {
         System.out.println("Here are the tasks in your list:");
@@ -107,7 +107,7 @@ public class Ui {
     /**
      * Displays a confirmation after marking a task as done.
      *
-     * @param task task that was marked as done
+     * @param task task that was marked as done.
      */
     public void showTaskMarkedDone(Task task) {
         System.out.println("Good work!! I've marked this task as done:");
@@ -117,7 +117,7 @@ public class Ui {
     /**
      * Displays a confirmation after marking a task as not done.
      *
-     * @param task task that was marked as not done
+     * @param task task that was marked as not done.
      */
     public void showTaskMarkedNotDone(Task task) {
         System.out.println("OK, I've marked this task as not done yet:");
@@ -127,8 +127,8 @@ public class Ui {
     /**
      * Displays a confirmation after deleting a task.
      *
-     * @param task task that was deleted
-     * @param taskCount number of tasks after the deletion
+     * @param task task that was deleted.
+     * @param taskCount number of tasks after the deletion.
      */
     public void showTaskDeleted(Task task, int taskCount) {
         System.out.println("Noted. I've removed this task:");

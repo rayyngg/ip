@@ -12,9 +12,9 @@ public class EmptyCommand extends Command {
     /**
      * Rejects the blank input represented by this command.
      *
-     * @param tasks current task list, unused
-     * @param ui user-interface handler, unused because the caller reports the error
-     * @param storage task persistence handler, unused
+     * @param tasks current task list, unused.
+     * @param ui user-interface handler, unused because the caller reports the error.
+     * @param storage task persistence handler, unused.
      * @throws TryBotException always, with a prompt for a valid command
      */
     @Override

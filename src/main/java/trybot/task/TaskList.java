@@ -19,7 +19,7 @@ public class TaskList {
     /**
      * Creates a task list containing a copy of the supplied tasks.
      *
-     * @param tasks initial tasks
+     * @param tasks initial tasks.
      * @throws IllegalArgumentException if the supplied list or one of its tasks is null
      */
     public TaskList(List<Task> tasks) {
@@ -32,7 +32,7 @@ public class TaskList {
     /**
      * Adds a task to the end of the list.
      *
-     * @param task task to add
+     * @param task task to add.
      * @throws IllegalArgumentException if the task is null
      */
     public void add(Task task) {
@@ -45,7 +45,7 @@ public class TaskList {
     /**
      * Gets a task at a zero-based index.
      *
-     * @param index zero-based task index
+     * @param index zero-based task index.
      * @return task at the requested index
      */
     public Task get(int index) {
@@ -55,7 +55,7 @@ public class TaskList {
     /**
      * Removes and returns a task at a zero-based index.
      *
-     * @param index zero-based task index
+     * @param index zero-based task index.
      * @return removed task
      */
     public Task remove(int index) {

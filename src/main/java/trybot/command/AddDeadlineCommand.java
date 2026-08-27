@@ -15,7 +15,7 @@ public class AddDeadlineCommand extends AddCommand {
     /**
      * Creates a deadline command.
      *
-     * @param deadline parsed deadline fields
+     * @param deadline parsed deadline fields.
      */
     public AddDeadlineCommand(Parser.ParsedDeadline deadline) {
         this.description = deadline.description();

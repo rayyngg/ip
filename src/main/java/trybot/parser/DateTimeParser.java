@@ -40,7 +40,7 @@ public final class DateTimeParser {
     /**
      * Parses a supported date or date-time, or returns null for legacy text such as "Friday".
      *
-     * @param value user-provided date or time text
+     * @param value user-provided date or time text.
      * @return parsed value, or null when the value is ordinary descriptive text
      * @throws IllegalArgumentException when the value looks numeric but is not a valid date
      */
@@ -77,7 +77,7 @@ public final class DateTimeParser {
     /**
      * Formats a parsed value for display in the task list.
      *
-     * @param parsedDateTime parsed date or date-time
+     * @param parsedDateTime parsed date or date-time.
      * @return human-readable date text
      */
     public static String formatForDisplay(ParsedDateTime parsedDateTime) {
@@ -90,7 +90,7 @@ public final class DateTimeParser {
     /**
      * Formats a parsed value for persistence.
      *
-     * @param parsedDateTime parsed date or date-time
+     * @param parsedDateTime parsed date or date-time.
      * @return canonical date text
      */
     public static String formatForStorage(ParsedDateTime parsedDateTime) {
@@ -103,7 +103,7 @@ public final class DateTimeParser {
     /**
      * Creates a strict English-locale formatter for a supported date pattern.
      *
-     * @param pattern date or date-time pattern
+     * @param pattern date or date-time pattern.
      * @return formatter that rejects invalid calendar values
      */
     private static DateTimeFormatter formatter(String pattern) {
@@ -114,7 +114,7 @@ public final class DateTimeParser {
     /**
      * Validates the value required by the formatting methods.
      *
-     * @param parsedDateTime value to validate
+     * @param parsedDateTime value to validate.
      * @throws IllegalArgumentException if the value or its date-time is null
      */
     private static void requireParsedValue(ParsedDateTime parsedDateTime) {
@@ -126,8 +126,8 @@ public final class DateTimeParser {
     /**
      * Holds the typed representation of one parsed date or date-time.
      *
-     * @param dateTime parsed date, with midnight used when no time was supplied
-     * @param hasTime whether the original value included a time
+     * @param dateTime parsed date, with midnight used when no time was supplied.
+     * @param hasTime whether the original value included a time.
      */
     public record ParsedDateTime(LocalDateTime dateTime, boolean hasTime) {
         public ParsedDateTime {

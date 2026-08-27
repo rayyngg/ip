@@ -10,7 +10,7 @@ public class Task {
     /**
      * Creates a task that is initially not done.
      *
-     * @param description text describing the task
+     * @param description text describing the task.
      */
     public Task(String description) {
         this.description = description;
@@ -61,7 +61,7 @@ public class Task {
     /**
      * Escapes characters that have a special meaning in the task data file.
      *
-     * @param field field text to escape
+     * @param field field text to escape.
      * @return escaped field text
      */
     protected String escapeStorageField(String field) {
