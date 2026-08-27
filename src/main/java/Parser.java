@@ -1,84 +1,50 @@
 import java.util.Locale;
 
 /**
- * Interprets raw user input as one of TryBot's supported command types.
+ * Interprets raw user input as executable TryBot commands.
  */
 public class Parser {
     /**
-     * The command categories recognized by TryBot.
-     */
-    public enum CommandType {
-        BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, EMPTY, UNKNOWN
-    }
-
-    /**
-     * The normalized meaning of one user command.
-     *
-     * @param type recognized command category
-     * @param body text after the command keyword, with an optional colon removed
-     */
-    public record ParsedCommand(CommandType type, String body) {
-    }
-
-    /**
-     * The fields needed to create a deadline task.
-     *
-     * @param description deadline description
-     * @param by date or time by which the task should be completed
-     */
-    public record ParsedDeadline(String description, String by) {
-    }
-
-    /**
-     * The fields needed to create an event task.
-     *
-     * @param description event description
-     * @param from event start date or time
-     * @param to event end date or time
-     */
-    public record ParsedEvent(String description, String from, String to) {
-    }
-
-    /**
-     * Parses one line of user input.
+     * Parses one line of user input into a command object.
      *
      * @param input raw user input
-     * @return parsed command and its normalized body
+     * @return executable command
+     * @throws TryBotException if a command has malformed structured arguments
      */
-    public ParsedCommand parse(String input) {
+    public Command parse(String input) throws TryBotException {
         if (input == null) {
-            return new ParsedCommand(CommandType.EMPTY, "");
+            return new EmptyCommand();
         }
 
         String command = input.trim();
         if (command.isEmpty()) {
-            return new ParsedCommand(CommandType.EMPTY, "");
+            return new EmptyCommand();
         }
         if (command.equalsIgnoreCase("bye") || command.equalsIgnoreCase("bye!")) {
-            return new ParsedCommand(CommandType.BYE, "");
+            return new ExitCommand();
         }
         if (command.equalsIgnoreCase("list")) {
-            return new ParsedCommand(CommandType.LIST, "");
+            return new ListCommand();
         }
         if (startsWithKeyword(command, "mark")) {
-            return new ParsedCommand(CommandType.MARK, getCommandBody(command, "mark"));
+            return new MarkCommand(parseTaskNumber(getCommandBody(command, "mark"), "mark"));
         }
         if (startsWithKeyword(command, "unmark")) {
-            return new ParsedCommand(CommandType.UNMARK, getCommandBody(command, "unmark"));
+            return new UnmarkCommand(parseTaskNumber(getCommandBody(command, "unmark"), "unmark"));
         }
         if (startsWithKeyword(command, "delete")) {
-            return new ParsedCommand(CommandType.DELETE, getCommandBody(command, "delete"));
+            return new DeleteCommand(parseTaskNumber(getCommandBody(command, "delete"), "delete"));
         }
         if (startsWithKeyword(command, "todo", true)) {
-            return new ParsedCommand(CommandType.TODO, getCommandBody(command, "todo"));
+            return new AddTodoCommand(getCommandBody(command, "todo"));
         }
         if (startsWithKeyword(command, "deadline", true)) {
-            return new ParsedCommand(CommandType.DEADLINE, getCommandBody(command, "deadline"));
+            return new AddDeadlineCommand(parseDeadline(getCommandBody(command, "deadline")));
         }
         if (startsWithKeyword(command, "event", true)) {
-            return new ParsedCommand(CommandType.EVENT, getCommandBody(command, "event"));
+            return new AddEventCommand(parseEvent(getCommandBody(command, "event")));
         }
-        return new ParsedCommand(CommandType.UNKNOWN, "");
+        return new UnknownCommand();
     }
 
     /**
@@ -88,7 +54,7 @@ public class Parser {
      * @return parsed deadline fields
      * @throws TryBotException if the body does not contain valid deadline fields
      */
-    public ParsedDeadline parseDeadline(String body) throws TryBotException {
+    private ParsedDeadline parseDeadline(String body) throws TryBotException {
         String lowerCaseBody = body.toLowerCase(Locale.ROOT);
         int byIndex = lowerCaseBody.indexOf("/by");
         if (byIndex < 0) {
@@ -110,7 +76,7 @@ public class Parser {
      * @return parsed event fields
      * @throws TryBotException if the body does not contain valid event fields
      */
-    public ParsedEvent parseEvent(String body) throws TryBotException {
+    private ParsedEvent parseEvent(String body) throws TryBotException {
         String lowerCaseBody = body.toLowerCase(Locale.ROOT);
         int fromIndex = lowerCaseBody.indexOf("/from");
         int toIndex = lowerCaseBody.indexOf("/to", fromIndex + "/from".length());
@@ -135,7 +101,7 @@ public class Parser {
      * @return parsed task number
      * @throws TryBotException if the body is missing, has extra values, or is not numeric
      */
-    public int parseTaskNumber(String body, String commandName) throws TryBotException {
+    private int parseTaskNumber(String body, String commandName) throws TryBotException {
         String[] commandParts = body.split("\\s+");
         if (body.isEmpty() || commandParts.length != 1) {
             String displayName = Character.toUpperCase(commandName.charAt(0)) + commandName.substring(1);
@@ -190,5 +156,24 @@ public class Parser {
             body = body.substring(1).trim();
         }
         return body;
+    }
+
+    /**
+     * Holds the fields needed to create a deadline task.
+     *
+     * @param description deadline description
+     * @param by date or time by which the task should be completed
+     */
+    public record ParsedDeadline(String description, String by) {
+    }
+
+    /**
+     * Holds the fields needed to create an event task.
+     *
+     * @param description event description
+     * @param from event start date or time
+     * @param to event end date or time
+     */
+    public record ParsedEvent(String description, String from, String to) {
     }
 }

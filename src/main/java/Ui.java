@@ -1,7 +1,10 @@
+import java.util.Scanner;
+
 /**
  * Handles all console interactions with the TryBot user.
  */
 public class Ui {
+    private final Scanner scanner = new Scanner(System.in);
     private static final String SEPARATOR = "____________________________________________________________";
     private static final String BANNER = " _____             ____        _\n"
             + "|_   _| _ __ _   _ | __ )  ___ | |_\n"
@@ -29,11 +32,38 @@ public class Ui {
     }
 
     /**
+     * Checks whether another command is available from the user.
+     *
+     * @return true when another input line can be read
+     */
+    public boolean hasMoreCommands() {
+        return scanner.hasNextLine();
+    }
+
+    /**
+     * Reads one complete command from the user.
+     *
+     * @return raw command text
+     */
+    public String readCommand() {
+        return scanner.nextLine();
+    }
+
+    /**
      * Displays TryBot's goodbye message.
      */
     public void showGoodbye() {
-        System.out.println("Bye. Hope to see you again soon!");
+        showGoodbyeMessage();
         showLine();
+    }
+
+    /**
+     * Displays only TryBot's goodbye message, without a separator.
+     *
+     * The command loop displays the final separator in its {@code finally} block.
+     */
+    public void showGoodbyeMessage() {
+        System.out.println("Bye. Hope to see you again soon!");
     }
 
     /**
