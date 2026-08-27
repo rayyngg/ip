@@ -174,7 +174,8 @@ public class TryBot {
         try {
             addTask(new Deadline(description, by), tasks);
         } catch (IllegalArgumentException exception) {
-            throw new TryBotException("The deadline date or time is invalid. Use yyyy-mm-dd or d/M/yyyy HHmm.");
+            throw new TryBotException(exception.getMessage() == null
+                    ? "The deadline date or time is invalid." : exception.getMessage());
         }
     }
 
@@ -203,7 +204,8 @@ public class TryBot {
         try {
             addTask(new Event(description, from, to), tasks);
         } catch (IllegalArgumentException exception) {
-            throw new TryBotException("The event date or time is invalid. Use yyyy-mm-dd or d/M/yyyy HHmm.");
+            throw new TryBotException(exception.getMessage() == null
+                    ? "The event date or time is invalid." : exception.getMessage());
         }
     }
 

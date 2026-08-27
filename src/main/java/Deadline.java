@@ -16,8 +16,11 @@ public class Deadline extends Task {
      */
     public Deadline(String description, String by) {
         super(description);
+        if (description == null || description.isBlank()) {
+            throw new IllegalArgumentException("A deadline description cannot be blank.");
+        }
+        DateTimeParser.ParsedDateTime parsedBy = DateTimeParser.parseOrNull(by);
         String trimmedBy = by.trim();
-        DateTimeParser.ParsedDateTime parsedBy = DateTimeParser.parseOrNull(trimmedBy);
         this.byText = parsedBy == null ? trimmedBy : null;
         this.byDateTime = parsedBy == null ? null : parsedBy.dateTime();
         this.byHasTime = parsedBy != null && parsedBy.hasTime();

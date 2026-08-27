@@ -272,6 +272,50 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
   ____________________________________________________________
   ```
 
+### UI-005B — Reject invalid numeric dates and event ranges (negative)
+
+- Aim: Verify that impossible dates, invalid times, and events whose end is before their start are rejected without adding tasks.
+- Command: `java -cp out TryBot`
+- Inputs:
+
+  ```text
+  deadline report /by 31/02/2019
+  deadline deploy /by 2019-12-01 2500
+  event invalid range /from 2020-01-02 1000 /to 2020-01-01 1000
+  list
+  bye
+  ```
+
+- Expected output:
+
+  ```text
+  ____________________________________________________________
+   _____             ____        _
+  |_   _| _ __ _   _ | __ )  ___ | |_
+    | |  | '__| | | ||  _ \ / _ \| __|
+    | |  | |  | |_| || |_) | (_) | |_
+    |_|  |_|   \__, ||____/ \___/ \__|
+                |___/
+  Hello! I'm TryBot.
+  What can I do for you?
+  ____________________________________________________________
+  ____________________________________________________________
+  Invalid date or time: 31/02/2019. Use yyyy-mm-dd or d/M/yyyy HHmm.
+  ____________________________________________________________
+  ____________________________________________________________
+  Invalid date or time: 2019-12-01 2500. Use yyyy-mm-dd or d/M/yyyy HHmm.
+  ____________________________________________________________
+  ____________________________________________________________
+  An event cannot end before it starts.
+  ____________________________________________________________
+  ____________________________________________________________
+  Here are the tasks in your list:
+  ____________________________________________________________
+  ____________________________________________________________
+  Bye. Hope to see you again soon!
+  ____________________________________________________________
+  ```
+
 ### UI-006 — Preserve valid state after invalid inputs (negative)
 
 - Aim: Verify that malformed deadline/event commands and invalid mark/unmark arguments do not alter an already valid todo.

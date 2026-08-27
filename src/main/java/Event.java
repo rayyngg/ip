@@ -20,10 +20,16 @@ public class Event extends Task {
      */
     public Event(String description, String from, String to) {
         super(description);
+        if (description == null || description.isBlank()) {
+            throw new IllegalArgumentException("An event description cannot be blank.");
+        }
+        DateTimeParser.ParsedDateTime parsedFrom = DateTimeParser.parseOrNull(from);
+        DateTimeParser.ParsedDateTime parsedTo = DateTimeParser.parseOrNull(to);
+        if (parsedFrom != null && parsedTo != null && parsedFrom.dateTime().isAfter(parsedTo.dateTime())) {
+            throw new IllegalArgumentException("An event cannot end before it starts.");
+        }
         String trimmedFrom = from.trim();
         String trimmedTo = to.trim();
-        DateTimeParser.ParsedDateTime parsedFrom = DateTimeParser.parseOrNull(trimmedFrom);
-        DateTimeParser.ParsedDateTime parsedTo = DateTimeParser.parseOrNull(trimmedTo);
         this.fromText = parsedFrom == null ? trimmedFrom : null;
         this.toText = parsedTo == null ? trimmedTo : null;
         this.fromDateTime = parsedFrom == null ? null : parsedFrom.dateTime();

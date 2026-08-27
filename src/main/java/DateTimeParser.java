@@ -29,7 +29,7 @@ public final class DateTimeParser {
     private static final DateTimeFormatter DISPLAY_DATE_FORMATTER = formatter("MMM dd uuuu");
     private static final DateTimeFormatter DISPLAY_DATE_TIME_FORMATTER = formatter("MMM dd uuuu HH:mm");
     private static final Pattern NUMERIC_DATE_PATTERN = Pattern.compile(
-            "\\s*\\d{1,4}[-/]\\d{1,2}[-/]\\d{1,4}(?:\\s+\\d{1,2}:?\\d{2})?\\s*");
+            "\\s*\\d{1,4}[-/]\\d{1,2}[-/]\\d{1,4}(?:\\s+.*)?\\s*");
 
     private DateTimeParser() {
         // Utility class; do not instantiate.
@@ -43,7 +43,13 @@ public final class DateTimeParser {
      * @throws IllegalArgumentException when the value looks numeric but is not a valid date
      */
     public static ParsedDateTime parseOrNull(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Date or time cannot be null.");
+        }
         String trimmedValue = value.trim();
+        if (trimmedValue.isEmpty()) {
+            throw new IllegalArgumentException("Date or time cannot be blank.");
+        }
         for (DateTimeFormatter formatter : DATE_TIME_FORMATTERS) {
             try {
                 return new ParsedDateTime(LocalDateTime.parse(trimmedValue, formatter), true);
@@ -60,7 +66,8 @@ public final class DateTimeParser {
             }
         }
         if (NUMERIC_DATE_PATTERN.matcher(trimmedValue).matches()) {
-            throw new IllegalArgumentException("Invalid date or time: " + trimmedValue);
+            throw new IllegalArgumentException("Invalid date or time: " + trimmedValue
+                    + ". Use yyyy-mm-dd or d/M/yyyy HHmm.");
         }
         return null;
     }
@@ -72,6 +79,7 @@ public final class DateTimeParser {
      * @return human-readable date text
      */
     public static String formatForDisplay(ParsedDateTime parsedDateTime) {
+        requireParsedValue(parsedDateTime);
         DateTimeFormatter formatter = parsedDateTime.hasTime()
                 ? DISPLAY_DATE_TIME_FORMATTER : DISPLAY_DATE_FORMATTER;
         return parsedDateTime.dateTime().format(formatter);
@@ -84,6 +92,7 @@ public final class DateTimeParser {
      * @return canonical date text
      */
     public static String formatForStorage(ParsedDateTime parsedDateTime) {
+        requireParsedValue(parsedDateTime);
         DateTimeFormatter formatter = parsedDateTime.hasTime()
                 ? STORAGE_DATE_TIME_FORMATTER : STORAGE_DATE_FORMATTER;
         return parsedDateTime.dateTime().format(formatter);
@@ -94,6 +103,12 @@ public final class DateTimeParser {
                 .withResolverStyle(ResolverStyle.STRICT);
     }
 
+    private static void requireParsedValue(ParsedDateTime parsedDateTime) {
+        if (parsedDateTime == null || parsedDateTime.dateTime() == null) {
+            throw new IllegalArgumentException("A parsed date or time is required.");
+        }
+    }
+
     /**
      * Holds the typed representation of one parsed date or date-time.
      *
@@ -101,5 +116,10 @@ public final class DateTimeParser {
      * @param hasTime whether the original value included a time
      */
     public record ParsedDateTime(LocalDateTime dateTime, boolean hasTime) {
+        public ParsedDateTime {
+            if (dateTime == null) {
+                throw new IllegalArgumentException("A parsed date or time cannot be null.");
+            }
+        }
     }
 }
