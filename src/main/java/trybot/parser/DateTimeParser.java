@@ -100,11 +100,23 @@ public final class DateTimeParser {
         return parsedDateTime.dateTime().format(formatter);
     }
 
+    /**
+     * Creates a strict English-locale formatter for a supported date pattern.
+     *
+     * @param pattern date or date-time pattern
+     * @return formatter that rejects invalid calendar values
+     */
     private static DateTimeFormatter formatter(String pattern) {
         return DateTimeFormatter.ofPattern(pattern, Locale.ENGLISH)
                 .withResolverStyle(ResolverStyle.STRICT);
     }
 
+    /**
+     * Validates the value required by the formatting methods.
+     *
+     * @param parsedDateTime value to validate
+     * @throws IllegalArgumentException if the value or its date-time is null
+     */
     private static void requireParsedValue(ParsedDateTime parsedDateTime) {
         if (parsedDateTime == null || parsedDateTime.dateTime() == null) {
             throw new IllegalArgumentException("A parsed date or time is required.");
