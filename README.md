@@ -30,3 +30,27 @@ ____________________________________________________________
    ```
 
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+
+## Creating and running the executable JAR
+
+The project uses the Gradle Shadow plugin to package TryBot and its runtime dependencies into one executable (fat) JAR file.
+
+From the project root, ensure that JDK 25 is active and run:
+
+```powershell
+.\gradlew.bat shadowJar
+```
+
+The generated file is:
+
+```text
+build\libs\TryBot.jar
+```
+
+To distribute TryBot, copy `TryBot.jar` into an empty folder. Open a command window in that folder and run:
+
+```text
+java -jar "TryBot.jar"
+```
+
+TryBot stores tasks in `data\trybot.txt` relative to the folder from which the JAR is run. The `data` folder and file are created automatically when a task is saved.

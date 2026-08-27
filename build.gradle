@@ -37,7 +37,7 @@ test {
 }
 
 application {
-    mainClass = 'seedu.duke.Duke'
+    mainClass = 'trybot.TryBot'
 }
 
 jar {
@@ -48,7 +48,10 @@ jar {
 }
 
 shadowJar {
-    archiveFileName = 'duke.jar'
+    archiveFileName = 'TryBot.jar'
+    manifest {
+        attributes 'Main-Class': 'trybot.TryBot'
+    }
 }
 
 run {
