@@ -80,11 +80,21 @@ public class Event extends Task {
                 : DateTimeParser.formatForDisplay(new DateTimeParser.ParsedDateTime(toDateTime, toHasTime));
     }
 
+    /**
+     * Returns the canonical event start value used in the task data file.
+     *
+     * @return storage-formatted date-time or the original descriptive text
+     */
     private String getFromStorageValue() {
         return fromDateTime == null ? fromText
                 : DateTimeParser.formatForStorage(new DateTimeParser.ParsedDateTime(fromDateTime, fromHasTime));
     }
 
+    /**
+     * Returns the canonical event end value used in the task data file.
+     *
+     * @return storage-formatted date-time or the original descriptive text
+     */
     private String getToStorageValue() {
         return toDateTime == null ? toText
                 : DateTimeParser.formatForStorage(new DateTimeParser.ParsedDateTime(toDateTime, toHasTime));

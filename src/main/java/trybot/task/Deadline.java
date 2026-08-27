@@ -51,6 +51,11 @@ public class Deadline extends Task {
         return DateTimeParser.formatForDisplay(new DateTimeParser.ParsedDateTime(byDateTime, byHasTime));
     }
 
+    /**
+     * Returns the canonical deadline value used in the task data file.
+     *
+     * @return storage-formatted date-time or the original descriptive text
+     */
     private String getByStorageValue() {
         if (byDateTime == null) {
             return byText;

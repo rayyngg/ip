@@ -18,6 +18,14 @@ public abstract class AddCommand extends Command {
      */
     protected abstract Task createTask() throws TryBotException;
 
+    /**
+     * Creates, stores, and reports the task represented by this command.
+     *
+     * @param tasks current task list
+     * @param ui user-interface handler
+     * @param storage task persistence handler
+     * @throws TryBotException if the task fields are invalid
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws TryBotException {
         Task task = createTask();
@@ -26,6 +34,11 @@ public abstract class AddCommand extends Command {
         ui.showTaskAdded(task, tasks.size());
     }
 
+    /**
+     * Indicates that adding a task does not end the session.
+     *
+     * @return always false
+     */
     @Override
     public boolean isExit() {
         return false;

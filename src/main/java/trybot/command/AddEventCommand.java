@@ -24,6 +24,12 @@ public class AddEventCommand extends AddCommand {
         this.to = event.to();
     }
 
+    /**
+     * Builds an event from the parsed command fields.
+     *
+     * @return the event task
+     * @throws TryBotException if the event date or time is invalid
+     */
     @Override
     protected Task createTask() throws TryBotException {
         try {
