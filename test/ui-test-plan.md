@@ -728,3 +728,62 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
   Bye. Hope to see you again soon!
   ____________________________________________________________
   ```
+
+### UI-014 — Find tasks by description keyword (positive and negative)
+
+- Aim: Verify that find matches a case-insensitive keyword within todo and deadline descriptions, preserves matching task order and status, reports no matches clearly, and rejects a missing keyword.
+- Command: `java -cp out trybot.TryBot`
+- Inputs:
+
+  ```text
+  todo read book
+  deadline return book /by Friday
+  mark 1
+  find BOOK
+  find laptop
+  find
+  bye
+  ```
+
+- Expected output:
+
+  ```text
+  ____________________________________________________________
+   _____             ____        _
+  |_   _| _ __ _   _ | __ )  ___ | |_
+    | |  | '__| | | ||  _ \ / _ \| __|
+    | |  | |  | |_| || |_) | (_) | |_
+    |_|  |_|   \__, ||____/ \___/ \__|
+                |___/
+  Hello! I'm TryBot.
+  What can I do for you?
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [T][ ] read book
+  Now you have 1 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [D][ ] return book (by: Friday)
+  Now you have 2 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Good work!! I've marked this task as done:
+  [T][X] read book
+  ____________________________________________________________
+  ____________________________________________________________
+  Here are the matching tasks in your list:
+  1.[T][X] read book
+  2.[D][ ] return book (by: Friday)
+  ____________________________________________________________
+  ____________________________________________________________
+  No tasks match that keyword.
+  ____________________________________________________________
+  ____________________________________________________________
+  Find needs a keyword. Example: find book.
+  ____________________________________________________________
+  ____________________________________________________________
+  Bye. Hope to see you again soon!
+  ____________________________________________________________
+  ```

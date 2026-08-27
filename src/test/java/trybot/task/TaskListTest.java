@@ -67,4 +67,24 @@ class TaskListTest {
         assertEquals(1, tasks.size());
         assertInstanceOf(Todo.class, tasks.get(0));
     }
+
+    @Test
+    void taskList_findByDescription_matchesCaseInsensitiveSubstringInOrder() {
+        Task first = new Todo("Read a book");
+        Task second = new Todo("return BOOK to the library");
+        Task unrelated = new Todo("write report");
+        TaskList tasks = new TaskList(List.of(first, second, unrelated));
+
+        assertEquals(List.of(first, second), tasks.findByDescription("book"));
+        assertEquals(List.of(first, second), tasks.findByDescription("  BOOK  "));
+    }
+
+    @Test
+    void taskList_findByDescription_rejectsBlankKeyword() {
+        TaskList tasks = new TaskList(List.of(new Todo("read book")));
+
+        assertThrows(IllegalArgumentException.class, () -> tasks.findByDescription(null));
+        assertThrows(IllegalArgumentException.class, () -> tasks.findByDescription("   "));
+        assertEquals(List.of(), tasks.findByDescription("missing"));
+    }
 }

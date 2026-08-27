@@ -9,6 +9,7 @@ import trybot.command.Command;
 import trybot.command.DeleteCommand;
 import trybot.command.EmptyCommand;
 import trybot.command.ExitCommand;
+import trybot.command.FindCommand;
 import trybot.command.ListCommand;
 import trybot.command.MarkCommand;
 import trybot.command.UnmarkCommand;
@@ -40,6 +41,9 @@ public class Parser {
         }
         if (command.equalsIgnoreCase("list")) {
             return new ListCommand();
+        }
+        if (startsWithKeyword(command, "find")) {
+            return new FindCommand(parseFindKeyword(getCommandBody(command, "find")));
         }
         if (startsWithKeyword(command, "mark")) {
             return new MarkCommand(parseTaskNumber(getCommandBody(command, "mark"), "mark"));
@@ -132,6 +136,20 @@ public class Parser {
         } catch (NumberFormatException exception) {
             throw new TryBotException("The task number must be a whole number. Example: " + commandName + " 1.");
         }
+    }
+
+    /**
+     * Parses the keyword used by a find command.
+     *
+     * @param body normalized text after the find keyword.
+     * @return non-blank search keyword
+     * @throws TryBotException if the keyword is missing or blank
+     */
+    private String parseFindKeyword(String body) throws TryBotException {
+        if (body.isBlank()) {
+            throw new TryBotException("Find needs a keyword. Example: find book.");
+        }
+        return body;
     }
 
     /**

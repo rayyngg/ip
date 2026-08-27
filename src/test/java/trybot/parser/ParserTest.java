@@ -13,6 +13,7 @@ import trybot.command.Command;
 import trybot.command.DeleteCommand;
 import trybot.command.EmptyCommand;
 import trybot.command.ExitCommand;
+import trybot.command.FindCommand;
 import trybot.command.ListCommand;
 import trybot.command.MarkCommand;
 import trybot.command.UnknownCommand;
@@ -30,6 +31,7 @@ class ParserTest {
         assertInstanceOf(ExitCommand.class, parser.parse("bye"));
         assertInstanceOf(ExitCommand.class, parser.parse(" BYE! "));
         assertInstanceOf(ListCommand.class, parser.parse("list"));
+        assertInstanceOf(FindCommand.class, parser.parse("find book"));
         assertInstanceOf(EmptyCommand.class, parser.parse("   "));
         assertInstanceOf(EmptyCommand.class, parser.parse(null));
         assertInstanceOf(UnknownCommand.class, parser.parse("archive"));
@@ -68,6 +70,8 @@ class ParserTest {
         assertThrows(TryBotException.class, () -> parser.parse("mark"));
         assertThrows(TryBotException.class, () -> parser.parse("mark abc"));
         assertThrows(TryBotException.class, () -> parser.parse("delete 1 2"));
+        assertThrows(TryBotException.class, () -> parser.parse("find"));
+        assertThrows(TryBotException.class, () -> parser.parse("find   "));
     }
 
     @Test
@@ -81,6 +85,13 @@ class ParserTest {
                 + "Example: deadline report /by Friday.", deadlineException.getMessage());
         assertEquals("An event needs /from and /to time details. "
                 + "Example: event meeting /from Monday /to Tuesday.", eventException.getMessage());
+    }
+
+    @Test
+    void parse_missingFindKeyword_reportsActionableMessage() {
+        TryBotException exception = assertThrows(TryBotException.class, () -> parser.parse("find"));
+
+        assertEquals("Find needs a keyword. Example: find book.", exception.getMessage());
     }
 
     /**
