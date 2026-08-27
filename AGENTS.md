@@ -28,9 +28,10 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 After every code update:
 
-1. Review `test/ui-test-plan.md` and add or update test cases, inputs, or expected outputs when the change affects the console UI. If the plan remains accurate, no test-plan edit is needed.
-2. Invoke the project-specific `$test-ui` skill from the repository root, using the test plan as the source of truth.
-3. Report the test session result and console transcript. The session must stop at the first failed test.
+1. Update the JUnit tests affected by the change. Maintain unit-test coverage for approximately the top 50% of methods by prioritizing complex, core, or critical business logic. JUnit tests need to be updated after each code change to comply with this target.
+2. Review `test/ui-test-plan.md` and add or update test cases, inputs, or expected outputs when the change affects the console UI. If the plan remains accurate, no test-plan edit is needed.
+3. Invoke the project-specific `$test-ui` skill from the repository root, using the test plan as the source of truth.
+4. Report the test session result and console transcript. The session must stop at the first failed test.
 
 ## Java version:
 
