@@ -111,24 +111,28 @@ public class Storage {
         }
 
         Task task;
-        switch (taskType) {
-        case "T":
-            task = fields.size() == 3 && !description.isEmpty() ? new Todo(description) : null;
-            break;
-        case "D":
-            String by = fields.size() == 4 ? unescapeField(fields.get(3)) : null;
-            task = by != null && !description.isEmpty() && !by.trim().isEmpty()
-                    ? new Deadline(description, by.trim()) : null;
-            break;
-        case "E":
-            String from = fields.size() == 5 ? unescapeField(fields.get(3)) : null;
-            String to = fields.size() == 5 ? unescapeField(fields.get(4)) : null;
-            task = from != null && to != null && !description.isEmpty()
-                    && !from.trim().isEmpty() && !to.trim().isEmpty()
-                    ? new Event(description, from.trim(), to.trim()) : null;
-            break;
-        default:
-            task = null;
+        try {
+            switch (taskType) {
+            case "T":
+                task = fields.size() == 3 && !description.isEmpty() ? new Todo(description) : null;
+                break;
+            case "D":
+                String by = fields.size() == 4 ? unescapeField(fields.get(3)) : null;
+                task = by != null && !description.isEmpty() && !by.trim().isEmpty()
+                        ? new Deadline(description, by.trim()) : null;
+                break;
+            case "E":
+                String from = fields.size() == 5 ? unescapeField(fields.get(3)) : null;
+                String to = fields.size() == 5 ? unescapeField(fields.get(4)) : null;
+                task = from != null && to != null && !description.isEmpty()
+                        && !from.trim().isEmpty() && !to.trim().isEmpty()
+                        ? new Event(description, from.trim(), to.trim()) : null;
+                break;
+            default:
+                task = null;
+            }
+        } catch (IllegalArgumentException exception) {
+            return null;
         }
 
         if (task != null && status.equals("1")) {

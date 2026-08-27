@@ -226,6 +226,52 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
   ____________________________________________________________
   ```
 
+### UI-005A — Parse numeric dates and times (positive)
+
+- Aim: Verify that numeric dates and times are parsed into typed date-times and displayed in a different human-readable format for deadlines and events.
+- Command: `java -cp out TryBot`
+- Inputs:
+
+  ```text
+  deadline return book /by 2/12/2019 1800
+  event study session /from 2019-12-03 0900 /to 3/12/2019 1030
+  list
+  bye
+  ```
+
+- Expected output:
+
+  ```text
+  ____________________________________________________________
+   _____             ____        _
+  |_   _| _ __ _   _ | __ )  ___ | |_
+    | |  | '__| | | ||  _ \ / _ \| __|
+    | |  | |  | |_| || |_) | (_) | |_
+    |_|  |_|   \__, ||____/ \___/ \__|
+                |___/
+  Hello! I'm TryBot.
+  What can I do for you?
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [D][ ] return book (by: Dec 02 2019 18:00)
+  Now you have 1 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [E][ ] study session (from: Dec 03 2019 09:00 to: Dec 03 2019 10:30)
+  Now you have 2 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Here are the tasks in your list:
+  1.[D][ ] return book (by: Dec 02 2019 18:00)
+  2.[E][ ] study session (from: Dec 03 2019 09:00 to: Dec 03 2019 10:30)
+  ____________________________________________________________
+  ____________________________________________________________
+  Bye. Hope to see you again soon!
+  ____________________________________________________________
+  ```
+
 ### UI-006 — Preserve valid state after invalid inputs (negative)
 
 - Aim: Verify that malformed deadline/event commands and invalid mark/unmark arguments do not alter an already valid todo.

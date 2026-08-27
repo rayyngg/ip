@@ -171,7 +171,11 @@ public class TryBot {
             throw new TryBotException("A deadline needs both a description and a date or time. Example: deadline report /by Friday.");
         }
 
-        addTask(new Deadline(description, by), tasks);
+        try {
+            addTask(new Deadline(description, by), tasks);
+        } catch (IllegalArgumentException exception) {
+            throw new TryBotException("The deadline date or time is invalid. Use yyyy-mm-dd or d/M/yyyy HHmm.");
+        }
     }
 
     /**
@@ -196,7 +200,11 @@ public class TryBot {
             throw new TryBotException("An event needs a description, start time, and end time. Example: event meeting /from Monday /to Tuesday.");
         }
 
-        addTask(new Event(description, from, to), tasks);
+        try {
+            addTask(new Event(description, from, to), tasks);
+        } catch (IllegalArgumentException exception) {
+            throw new TryBotException("The event date or time is invalid. Use yyyy-mm-dd or d/M/yyyy HHmm.");
+        }
     }
 
     /**

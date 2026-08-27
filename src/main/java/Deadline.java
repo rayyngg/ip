@@ -1,8 +1,12 @@
+import java.time.LocalDateTime;
+
 /**
  * A task that must be completed by a specified date or time.
  */
 public class Deadline extends Task {
-    protected String by;
+    private final String byText;
+    private final LocalDateTime byDateTime;
+    private final boolean byHasTime;
 
     /**
      * Creates an incomplete deadline task.
@@ -12,7 +16,39 @@ public class Deadline extends Task {
      */
     public Deadline(String description, String by) {
         super(description);
-        this.by = by;
+        String trimmedBy = by.trim();
+        DateTimeParser.ParsedDateTime parsedBy = DateTimeParser.parseOrNull(trimmedBy);
+        this.byText = parsedBy == null ? trimmedBy : null;
+        this.byDateTime = parsedBy == null ? null : parsedBy.dateTime();
+        this.byHasTime = parsedBy != null && parsedBy.hasTime();
+    }
+
+    /**
+     * Returns the typed deadline when the input was a supported numeric date or date-time.
+     *
+     * @return deadline date-time, or null for legacy descriptive text
+     */
+    public LocalDateTime getByDateTime() {
+        return byDateTime;
+    }
+
+    /**
+     * Returns the deadline as it should be shown to the user.
+     *
+     * @return formatted date-time or the original descriptive text
+     */
+    public String getBy() {
+        if (byDateTime == null) {
+            return byText;
+        }
+        return DateTimeParser.formatForDisplay(new DateTimeParser.ParsedDateTime(byDateTime, byHasTime));
+    }
+
+    private String getByStorageValue() {
+        if (byDateTime == null) {
+            return byText;
+        }
+        return DateTimeParser.formatForStorage(new DateTimeParser.ParsedDateTime(byDateTime, byHasTime));
     }
 
     /**
@@ -23,7 +59,7 @@ public class Deadline extends Task {
     @Override
     public String toStorageString() {
         return "D | " + (isDone ? "1" : "0") + " | " + escapeStorageField(description)
-                + " | " + escapeStorageField(by);
+                + " | " + escapeStorageField(getByStorageValue());
     }
 
     /**
@@ -33,6 +69,6 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by + ")";
+        return "[D]" + super.toString() + " (by: " + getBy() + ")";
     }
 }
