@@ -1,3 +1,5 @@
+import java.util.Locale;
+
 /**
  * Interprets raw user input as one of TryBot's supported command types.
  */
@@ -16,6 +18,25 @@ public class Parser {
      * @param body text after the command keyword, with an optional colon removed
      */
     public record ParsedCommand(CommandType type, String body) {
+    }
+
+    /**
+     * The fields needed to create a deadline task.
+     *
+     * @param description deadline description
+     * @param by date or time by which the task should be completed
+     */
+    public record ParsedDeadline(String description, String by) {
+    }
+
+    /**
+     * The fields needed to create an event task.
+     *
+     * @param description event description
+     * @param from event start date or time
+     * @param to event end date or time
+     */
+    public record ParsedEvent(String description, String from, String to) {
     }
 
     /**
@@ -58,6 +79,74 @@ public class Parser {
             return new ParsedCommand(CommandType.EVENT, getCommandBody(command, "event"));
         }
         return new ParsedCommand(CommandType.UNKNOWN, "");
+    }
+
+    /**
+     * Parses the structured fields of a deadline command body.
+     *
+     * @param body normalized text after the deadline keyword
+     * @return parsed deadline fields
+     * @throws TryBotException if the body does not contain valid deadline fields
+     */
+    public ParsedDeadline parseDeadline(String body) throws TryBotException {
+        String lowerCaseBody = body.toLowerCase(Locale.ROOT);
+        int byIndex = lowerCaseBody.indexOf("/by");
+        if (byIndex < 0) {
+            throw new TryBotException("A deadline needs /by followed by a date or time. Example: deadline report /by Friday.");
+        }
+
+        String description = body.substring(0, byIndex).trim();
+        String by = body.substring(byIndex + "/by".length()).trim();
+        if (description.isEmpty() || by.isEmpty()) {
+            throw new TryBotException("A deadline needs both a description and a date or time. Example: deadline report /by Friday.");
+        }
+        return new ParsedDeadline(description, by);
+    }
+
+    /**
+     * Parses the structured fields of an event command body.
+     *
+     * @param body normalized text after the event keyword
+     * @return parsed event fields
+     * @throws TryBotException if the body does not contain valid event fields
+     */
+    public ParsedEvent parseEvent(String body) throws TryBotException {
+        String lowerCaseBody = body.toLowerCase(Locale.ROOT);
+        int fromIndex = lowerCaseBody.indexOf("/from");
+        int toIndex = lowerCaseBody.indexOf("/to", fromIndex + "/from".length());
+        if (fromIndex < 0 || toIndex < 0) {
+            throw new TryBotException("An event needs /from and /to time details. Example: event meeting /from Monday /to Tuesday.");
+        }
+
+        String description = body.substring(0, fromIndex).trim();
+        String from = body.substring(fromIndex + "/from".length(), toIndex).trim();
+        String to = body.substring(toIndex + "/to".length()).trim();
+        if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
+            throw new TryBotException("An event needs a description, start time, and end time. Example: event meeting /from Monday /to Tuesday.");
+        }
+        return new ParsedEvent(description, from, to);
+    }
+
+    /**
+     * Parses the single task number used by mark, unmark, and delete commands.
+     *
+     * @param body normalized text after the command keyword
+     * @param commandName lowercase command name used in error messages
+     * @return parsed task number
+     * @throws TryBotException if the body is missing, has extra values, or is not numeric
+     */
+    public int parseTaskNumber(String body, String commandName) throws TryBotException {
+        String[] commandParts = body.split("\\s+");
+        if (body.isEmpty() || commandParts.length != 1) {
+            String displayName = Character.toUpperCase(commandName.charAt(0)) + commandName.substring(1);
+            throw new TryBotException(displayName + " needs one task number. Example: " + commandName + " 1.");
+        }
+
+        try {
+            return Integer.parseInt(commandParts[0]);
+        } catch (NumberFormatException exception) {
+            throw new TryBotException("The task number must be a whole number. Example: " + commandName + " 1.");
+        }
     }
 
     /**
