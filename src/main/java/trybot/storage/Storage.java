@@ -32,7 +32,7 @@ public class Storage {
     /**
      * Creates storage using the specified task file.
      *
-     * @param filePath path to the task file
+     * @param filePath path to the task file.
      */
     public Storage(String filePath) {
         this(Path.of(filePath));
@@ -41,7 +41,7 @@ public class Storage {
     /**
      * Creates storage using the specified task file.
      *
-     * @param taskFile path to the task file
+     * @param taskFile path to the task file.
      */
     public Storage(Path taskFile) {
         if (taskFile == null) {
@@ -53,7 +53,7 @@ public class Storage {
     /**
      * Replaces the saved task data with the current task list.
      *
-     * @param tasks tasks to save
+     * @param tasks tasks to save.
      * @throws IOException if the task file cannot be created or written
      */
     public void saveTasks(List<Task> tasks) throws IOException {
@@ -119,7 +119,7 @@ public class Storage {
     /**
      * Converts one saved line into a task.
      *
-     * @param line saved task data
+     * @param line saved task data.
      * @return the parsed task, or null when the line is blank or malformed
      */
     private static Task parseTask(String line) {
@@ -179,7 +179,7 @@ public class Storage {
     /**
      * Splits a saved line at unescaped field separators.
      *
-     * @param line saved task data
+     * @param line saved task data.
      * @return fields, or null when the line ends with an incomplete escape
      */
     private static List<String> splitFields(String line) {
@@ -210,7 +210,7 @@ public class Storage {
     /**
      * Decodes an escaped field from the task data file.
      *
-     * @param field escaped field text
+     * @param field escaped field text.
      * @return decoded field, or null when the escape sequence is incomplete
      */
     private static String unescapeField(String field) {
@@ -227,6 +227,7 @@ public class Storage {
             char escapedCharacter = field.charAt(++i);
             switch (escapedCharacter) {
             case '\\':
+                // Fallthrough
             case '|':
                 decoded.append(escapedCharacter);
                 break;

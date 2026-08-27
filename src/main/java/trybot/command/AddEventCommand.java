@@ -16,7 +16,7 @@ public class AddEventCommand extends AddCommand {
     /**
      * Creates an event command.
      *
-     * @param event parsed event fields
+     * @param event parsed event fields.
      */
     public AddEventCommand(Parser.ParsedEvent event) {
         this.description = event.description();

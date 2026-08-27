@@ -11,9 +11,9 @@ public class ListCommand extends Command {
     /**
      * Displays the current tasks in their stored order.
      *
-     * @param tasks current task list
-     * @param ui user-interface handler
-     * @param storage task persistence handler, unused because listing is read-only
+     * @param tasks current task list.
+     * @param ui user-interface handler.
+     * @param storage task persistence handler, unused because listing is read-only.
      */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {

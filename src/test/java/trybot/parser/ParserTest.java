@@ -70,6 +70,19 @@ class ParserTest {
         assertThrows(TryBotException.class, () -> parser.parse("delete 1 2"));
     }
 
+    @Test
+    void parse_missingStructuredFields_reportsActionableMessages() {
+        TryBotException deadlineException = assertThrows(TryBotException.class,
+                () -> parser.parse("deadline report"));
+        TryBotException eventException = assertThrows(TryBotException.class,
+                () -> parser.parse("event meeting /from Monday"));
+
+        assertEquals("A deadline needs /by followed by a date or time. "
+                + "Example: deadline report /by Friday.", deadlineException.getMessage());
+        assertEquals("An event needs /from and /to time details. "
+                + "Example: event meeting /from Monday /to Tuesday.", eventException.getMessage());
+    }
+
     /**
      * Adapts the checked parser contract for the one valid command that is
      * intentionally validated later, during command execution.

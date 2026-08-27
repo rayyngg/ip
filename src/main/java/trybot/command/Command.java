@@ -12,9 +12,9 @@ public abstract class Command {
     /**
      * Executes this command against the current application state.
      *
-     * @param tasks current task list
-     * @param ui user-interface handler
-     * @param storage task persistence handler
+     * @param tasks current task list.
+     * @param ui user-interface handler.
+     * @param storage task persistence handler.
      * @throws TryBotException if the command cannot be completed
      */
     public abstract void execute(TaskList tasks, Ui ui, Storage storage) throws TryBotException;
@@ -29,9 +29,9 @@ public abstract class Command {
     /**
      * Saves the task list and reports persistence failures through the UI.
      *
-     * @param tasks current task list
-     * @param ui user-interface handler
-     * @param storage task persistence handler
+     * @param tasks current task list.
+     * @param ui user-interface handler.
+     * @param storage task persistence handler.
      */
     protected void saveTasks(TaskList tasks, Ui ui, Storage storage) {
         try {

@@ -15,7 +15,7 @@ public class MarkCommand extends Command {
     /**
      * Creates a mark command.
      *
-     * @param taskNumber one-based task number
+     * @param taskNumber one-based task number.
      */
     public MarkCommand(int taskNumber) {
         this.taskNumber = taskNumber;
@@ -24,9 +24,9 @@ public class MarkCommand extends Command {
     /**
      * Marks the selected task as done, saves the updated list, and reports the result.
      *
-     * @param tasks current task list
-     * @param ui user-interface handler
-     * @param storage task persistence handler
+     * @param tasks current task list.
+     * @param ui user-interface handler.
+     * @param storage task persistence handler.
      * @throws TryBotException if the task number is outside the list
      */
     @Override

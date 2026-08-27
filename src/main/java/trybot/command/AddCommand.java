@@ -21,9 +21,9 @@ public abstract class AddCommand extends Command {
     /**
      * Creates, stores, and reports the task represented by this command.
      *
-     * @param tasks current task list
-     * @param ui user-interface handler
-     * @param storage task persistence handler
+     * @param tasks current task list.
+     * @param ui user-interface handler.
+     * @param storage task persistence handler.
      * @throws TryBotException if the task fields are invalid
      */
     @Override

@@ -103,9 +103,9 @@ class DateTimeParserTest {
     /**
      * Verifies both the parsed date-time and whether the input included a time.
      *
-     * @param input date or date-time text to parse
-     * @param expectedDateTime expected parsed value
-     * @param expectedHasTime expected time-presence flag
+     * @param input date or date-time text to parse.
+     * @param expectedDateTime expected parsed value.
+     * @param expectedHasTime expected time-presence flag.
      */
     private static void assertParsed(String input, LocalDateTime expectedDateTime, boolean expectedHasTime) {
         DateTimeParser.ParsedDateTime actual = DateTimeParser.parseOrNull(input);

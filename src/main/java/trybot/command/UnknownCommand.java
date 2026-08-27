@@ -12,9 +12,9 @@ public class UnknownCommand extends Command {
     /**
      * Rejects an unsupported command.
      *
-     * @param tasks current task list, unused
-     * @param ui user-interface handler, unused because the caller reports the error
-     * @param storage task persistence handler, unused
+     * @param tasks current task list, unused.
+     * @param ui user-interface handler, unused because the caller reports the error.
+     * @param storage task persistence handler, unused.
      * @throws TryBotException always, with a prompt for supported commands
      */
     @Override

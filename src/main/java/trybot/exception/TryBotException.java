@@ -8,7 +8,7 @@ public class TryBotException extends Exception {
     /**
      * Creates an exception with a user-friendly explanation of the error.
      *
-     * @param message explanation shown to the user
+     * @param message explanation shown to the user.
      */
     public TryBotException(String message) {
         super(message);
