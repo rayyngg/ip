@@ -1,6 +1,4 @@
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -9,7 +7,7 @@ import java.util.Scanner;
 public class TryBot {
     public static void main(String[] args) {
         Ui ui = new Ui();
-        List<Task> tasks = loadTasks(ui);
+        TaskList tasks = loadTasks(ui);
 
         ui.showWelcome();
 
@@ -146,7 +144,7 @@ public class TryBot {
      * @param tasks tasks currently stored by TryBot
      * @throws TryBotException if the deadline format is invalid
      */
-    private static void addDeadlineTask(String command, List<Task> tasks, Ui ui) throws TryBotException {
+    private static void addDeadlineTask(String command, TaskList tasks, Ui ui) throws TryBotException {
         int byIndex = command.toLowerCase().indexOf("/by");
         if (byIndex < 0) {
             throw new TryBotException("A deadline needs /by followed by a date or time. Example: deadline report /by Friday.");
@@ -173,7 +171,7 @@ public class TryBot {
      * @param tasks tasks currently stored by TryBot
      * @throws TryBotException if the event format is invalid
      */
-    private static void addEventTask(String command, List<Task> tasks, Ui ui) throws TryBotException {
+    private static void addEventTask(String command, TaskList tasks, Ui ui) throws TryBotException {
         String lowerCaseCommand = command.toLowerCase();
         int fromIndex = lowerCaseCommand.indexOf("/from");
         int toIndex = lowerCaseCommand.indexOf("/to", fromIndex + "/from".length());
@@ -202,7 +200,7 @@ public class TryBot {
      * @param task task to add
      * @param tasks tasks currently stored by TryBot
      */
-    private static void addTask(Task task, List<Task> tasks, Ui ui) {
+    private static void addTask(Task task, TaskList tasks, Ui ui) {
         tasks.add(task);
         saveTasks(tasks, ui);
         ui.showTaskAdded(task, tasks.size());
@@ -215,7 +213,7 @@ public class TryBot {
      * @param tasks tasks currently stored by TryBot
      * @throws TryBotException if the command has no valid task number
      */
-    private static void markTaskAsDone(String command, List<Task> tasks, Ui ui) throws TryBotException {
+    private static void markTaskAsDone(String command, TaskList tasks, Ui ui) throws TryBotException {
         String[] commandParts = command.split("\\s+");
         if (commandParts.length != 2) {
             throw new TryBotException("Mark needs one task number. Example: mark 1.");
@@ -245,7 +243,7 @@ public class TryBot {
      * @param tasks tasks currently stored by TryBot
      * @throws TryBotException if the command has no valid task number
      */
-    private static void unmarkTask(String command, List<Task> tasks, Ui ui) throws TryBotException {
+    private static void unmarkTask(String command, TaskList tasks, Ui ui) throws TryBotException {
         String[] commandParts = command.split("\\s+");
         if (commandParts.length != 2) {
             throw new TryBotException("Unmark needs one task number. Example: unmark 1.");
@@ -275,7 +273,7 @@ public class TryBot {
      * @param tasks tasks currently stored by TryBot
      * @throws TryBotException if the command has no valid task number
      */
-    private static void deleteTask(String command, List<Task> tasks, Ui ui) throws TryBotException {
+    private static void deleteTask(String command, TaskList tasks, Ui ui) throws TryBotException {
         String[] commandParts = command.split("\\s+");
         if (commandParts.length != 2) {
             throw new TryBotException("Delete needs one task number. Example: delete 1.");
@@ -302,9 +300,9 @@ public class TryBot {
      *
      * @param tasks tasks currently stored by TryBot
      */
-    private static void saveTasks(List<Task> tasks, Ui ui) {
+    private static void saveTasks(TaskList tasks, Ui ui) {
         try {
-            Storage.saveTasks(tasks);
+            Storage.saveTasks(tasks.toList());
         } catch (IOException exception) {
             ui.showSavingError();
         }
@@ -315,12 +313,12 @@ public class TryBot {
      *
      * @return tasks saved by an earlier TryBot session
      */
-    private static List<Task> loadTasks(Ui ui) {
+    private static TaskList loadTasks(Ui ui) {
         try {
-            return Storage.loadTasks();
+            return new TaskList(Storage.loadTasks());
         } catch (IOException exception) {
             ui.showLoadingError();
-            return new ArrayList<>();
+            return new TaskList();
         }
     }
 }
