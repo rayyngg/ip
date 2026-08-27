@@ -21,6 +21,14 @@ public class DeleteCommand extends Command {
         this.taskNumber = taskNumber;
     }
 
+    /**
+     * Removes the selected task, saves the updated list, and reports the result.
+     *
+     * @param tasks current task list
+     * @param ui user-interface handler
+     * @param storage task persistence handler
+     * @throws TryBotException if the task number is outside the list
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws TryBotException {
         if (taskNumber < 1 || taskNumber > tasks.size()) {
@@ -32,6 +40,11 @@ public class DeleteCommand extends Command {
         ui.showTaskDeleted(removedTask, tasks.size());
     }
 
+    /**
+     * Indicates that deleting a task does not end the session.
+     *
+     * @return always false
+     */
     @Override
     public boolean isExit() {
         return false;

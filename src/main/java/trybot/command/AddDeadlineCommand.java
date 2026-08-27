@@ -22,6 +22,12 @@ public class AddDeadlineCommand extends AddCommand {
         this.by = deadline.by();
     }
 
+    /**
+     * Builds a deadline from the parsed command fields.
+     *
+     * @return the deadline task
+     * @throws TryBotException if the deadline date or time is invalid
+     */
     @Override
     protected Task createTask() throws TryBotException {
         try {

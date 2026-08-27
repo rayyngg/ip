@@ -19,6 +19,12 @@ public class AddTodoCommand extends AddCommand {
         this.description = description;
     }
 
+    /**
+     * Builds a todo from the parsed description.
+     *
+     * @return the todo task
+     * @throws TryBotException if the description is empty
+     */
     @Override
     protected Task createTask() throws TryBotException {
         if (description.isEmpty()) {
