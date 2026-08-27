@@ -7,33 +7,20 @@ import java.util.Scanner;
  * A simple chatbot that stores tasks until the user says goodbye.
  */
 public class TryBot {
-    private static final String SEPARATOR = "____________________________________________________________";
-
     public static void main(String[] args) {
-        String banner = " _____             ____        _\n"
-                + "|_   _| _ __ _   _ | __ )  ___ | |_\n"
-                + "  | |  | '__| | | ||  _ \\ / _ \\| __|\n"
-                + "  | |  | |  | |_| || |_) | (_) | |_\n"
-                + "  |_|  |_|   \\__, ||____/ \\___/ \\__|\n"
-                + "              |___/\n";
+        Ui ui = new Ui();
+        List<Task> tasks = loadTasks(ui);
 
-        List<Task> tasks = loadTasks();
-
-        System.out.println(SEPARATOR);
-        System.out.print(banner);
-        System.out.println("Hello! I'm TryBot.");
-        System.out.println("What can I do for you?");
-        System.out.println(SEPARATOR);
+        ui.showWelcome();
 
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
             String trimmedCommand = command.trim();
-            System.out.println(SEPARATOR);
+            ui.showLine();
 
             if (trimmedCommand.equalsIgnoreCase("bye") || trimmedCommand.equalsIgnoreCase("bye!")) {
-                System.out.println("Bye. Hope to see you again soon!");
-                System.out.println(SEPARATOR);
+                ui.showGoodbye();
                 break;
             }
 
@@ -43,31 +30,31 @@ public class TryBot {
                 }
 
                 if (trimmedCommand.equalsIgnoreCase("list")) {
-                    printTaskList(tasks);
+                    ui.showTaskList(tasks);
                 } else if (isMarkCommand(trimmedCommand)) {
-                    markTaskAsDone(trimmedCommand, tasks);
+                    markTaskAsDone(trimmedCommand, tasks, ui);
                 } else if (isUnmarkCommand(trimmedCommand)) {
-                    unmarkTask(trimmedCommand, tasks);
+                    unmarkTask(trimmedCommand, tasks, ui);
                 } else if (isDeleteCommand(trimmedCommand)) {
-                    deleteTask(trimmedCommand, tasks);
+                    deleteTask(trimmedCommand, tasks, ui);
                 } else if (isTodoCommand(trimmedCommand)) {
                     String description = getCommandBody(trimmedCommand, "todo");
                     if (description.isEmpty()) {
                         throw new TryBotException("A todo needs a description. Try: todo read book.");
                     }
-                    addTask(new Todo(description), tasks);
+                    addTask(new Todo(description), tasks, ui);
                 } else if (isDeadlineCommand(trimmedCommand)) {
-                    addDeadlineTask(trimmedCommand, tasks);
+                    addDeadlineTask(trimmedCommand, tasks, ui);
                 } else if (isEventCommand(trimmedCommand)) {
-                    addEventTask(trimmedCommand, tasks);
+                    addEventTask(trimmedCommand, tasks, ui);
                 } else {
                     throw new TryBotException("I do not recognise that command. Try todo, list, or bye.");
                 }
             } catch (TryBotException exception) {
-                System.out.println(exception.getMessage());
+                ui.showError(exception.getMessage());
             }
 
-            System.out.println(SEPARATOR);
+            ui.showLine();
         }
     }
 
@@ -159,7 +146,7 @@ public class TryBot {
      * @param tasks tasks currently stored by TryBot
      * @throws TryBotException if the deadline format is invalid
      */
-    private static void addDeadlineTask(String command, List<Task> tasks) throws TryBotException {
+    private static void addDeadlineTask(String command, List<Task> tasks, Ui ui) throws TryBotException {
         int byIndex = command.toLowerCase().indexOf("/by");
         if (byIndex < 0) {
             throw new TryBotException("A deadline needs /by followed by a date or time. Example: deadline report /by Friday.");
@@ -172,7 +159,7 @@ public class TryBot {
         }
 
         try {
-            addTask(new Deadline(description, by), tasks);
+            addTask(new Deadline(description, by), tasks, ui);
         } catch (IllegalArgumentException exception) {
             throw new TryBotException(exception.getMessage() == null
                     ? "The deadline date or time is invalid." : exception.getMessage());
@@ -186,7 +173,7 @@ public class TryBot {
      * @param tasks tasks currently stored by TryBot
      * @throws TryBotException if the event format is invalid
      */
-    private static void addEventTask(String command, List<Task> tasks) throws TryBotException {
+    private static void addEventTask(String command, List<Task> tasks, Ui ui) throws TryBotException {
         String lowerCaseCommand = command.toLowerCase();
         int fromIndex = lowerCaseCommand.indexOf("/from");
         int toIndex = lowerCaseCommand.indexOf("/to", fromIndex + "/from".length());
@@ -202,7 +189,7 @@ public class TryBot {
         }
 
         try {
-            addTask(new Event(description, from, to), tasks);
+            addTask(new Event(description, from, to), tasks, ui);
         } catch (IllegalArgumentException exception) {
             throw new TryBotException(exception.getMessage() == null
                     ? "The event date or time is invalid." : exception.getMessage());
@@ -215,24 +202,10 @@ public class TryBot {
      * @param task task to add
      * @param tasks tasks currently stored by TryBot
      */
-    private static void addTask(Task task, List<Task> tasks) {
+    private static void addTask(Task task, List<Task> tasks, Ui ui) {
         tasks.add(task);
-        saveTasks(tasks);
-        System.out.println("Got it. I've added this task:");
-        System.out.println(task);
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-    }
-
-    /**
-     * Prints every task together with its completion status.
-     *
-     * @param tasks tasks currently stored by TryBot
-     */
-    private static void printTaskList(List<Task> tasks) {
-        System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println((i + 1) + "." + tasks.get(i));
-        }
+        saveTasks(tasks, ui);
+        ui.showTaskAdded(task, tasks.size());
     }
 
     /**
@@ -242,7 +215,7 @@ public class TryBot {
      * @param tasks tasks currently stored by TryBot
      * @throws TryBotException if the command has no valid task number
      */
-    private static void markTaskAsDone(String command, List<Task> tasks) throws TryBotException {
+    private static void markTaskAsDone(String command, List<Task> tasks, Ui ui) throws TryBotException {
         String[] commandParts = command.split("\\s+");
         if (commandParts.length != 2) {
             throw new TryBotException("Mark needs one task number. Example: mark 1.");
@@ -261,9 +234,8 @@ public class TryBot {
 
         int taskIndex = taskNumber - 1;
         tasks.get(taskIndex).markAsDone();
-        saveTasks(tasks);
-        System.out.println("Good work!! I've marked this task as done:");
-        System.out.println(tasks.get(taskIndex));
+        saveTasks(tasks, ui);
+        ui.showTaskMarkedDone(tasks.get(taskIndex));
     }
 
     /**
@@ -273,7 +245,7 @@ public class TryBot {
      * @param tasks tasks currently stored by TryBot
      * @throws TryBotException if the command has no valid task number
      */
-    private static void unmarkTask(String command, List<Task> tasks) throws TryBotException {
+    private static void unmarkTask(String command, List<Task> tasks, Ui ui) throws TryBotException {
         String[] commandParts = command.split("\\s+");
         if (commandParts.length != 2) {
             throw new TryBotException("Unmark needs one task number. Example: unmark 1.");
@@ -292,9 +264,8 @@ public class TryBot {
 
         int taskIndex = taskNumber - 1;
         tasks.get(taskIndex).markAsNotDone();
-        saveTasks(tasks);
-        System.out.println("OK, I've marked this task as not done yet:");
-        System.out.println(tasks.get(taskIndex));
+        saveTasks(tasks, ui);
+        ui.showTaskMarkedNotDone(tasks.get(taskIndex));
     }
 
     /**
@@ -304,7 +275,7 @@ public class TryBot {
      * @param tasks tasks currently stored by TryBot
      * @throws TryBotException if the command has no valid task number
      */
-    private static void deleteTask(String command, List<Task> tasks) throws TryBotException {
+    private static void deleteTask(String command, List<Task> tasks, Ui ui) throws TryBotException {
         String[] commandParts = command.split("\\s+");
         if (commandParts.length != 2) {
             throw new TryBotException("Delete needs one task number. Example: delete 1.");
@@ -322,10 +293,8 @@ public class TryBot {
         }
 
         Task removedTask = tasks.remove(taskNumber - 1);
-        saveTasks(tasks);
-        System.out.println("Noted. I've removed this task:");
-        System.out.println(removedTask);
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+        saveTasks(tasks, ui);
+        ui.showTaskDeleted(removedTask, tasks.size());
     }
 
     /**
@@ -333,12 +302,11 @@ public class TryBot {
      *
      * @param tasks tasks currently stored by TryBot
      */
-    private static void saveTasks(List<Task> tasks) {
+    private static void saveTasks(List<Task> tasks, Ui ui) {
         try {
             Storage.saveTasks(tasks);
         } catch (IOException exception) {
-            System.err.println("Warning: TryBot could not save the task list. "
-                    + "Your changes will be lost when TryBot exits.");
+            ui.showSavingError();
         }
     }
 
@@ -347,12 +315,11 @@ public class TryBot {
      *
      * @return tasks saved by an earlier TryBot session
      */
-    private static List<Task> loadTasks() {
+    private static List<Task> loadTasks(Ui ui) {
         try {
             return Storage.loadTasks();
         } catch (IOException exception) {
-            System.err.println("Warning: TryBot could not load the saved task list. "
-                    + "Starting with an empty list.");
+            ui.showLoadingError();
             return new ArrayList<>();
         }
     }
