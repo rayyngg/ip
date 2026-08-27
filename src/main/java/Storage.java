@@ -13,7 +13,35 @@ import java.util.Locale;
  * Saves TryBot's task list to a file on disk.
  */
 public class Storage {
-    private static final Path TASK_FILE = Path.of("data", "trybot.txt");
+    private final Path taskFile;
+
+    /**
+     * Creates storage using TryBot's default task file.
+     */
+    public Storage() {
+        this(Path.of("data", "trybot.txt"));
+    }
+
+    /**
+     * Creates storage using the specified task file.
+     *
+     * @param filePath path to the task file
+     */
+    public Storage(String filePath) {
+        this(Path.of(filePath));
+    }
+
+    /**
+     * Creates storage using the specified task file.
+     *
+     * @param taskFile path to the task file
+     */
+    public Storage(Path taskFile) {
+        if (taskFile == null) {
+            throw new IllegalArgumentException("The task file path cannot be null.");
+        }
+        this.taskFile = taskFile;
+    }
 
     /**
      * Replaces the saved task data with the current task list.
@@ -21,7 +49,7 @@ public class Storage {
      * @param tasks tasks to save
      * @throws IOException if the task file cannot be created or written
      */
-    public static void saveTasks(List<Task> tasks) throws IOException {
+    public void saveTasks(List<Task> tasks) throws IOException {
         if (tasks == null) {
             throw new IllegalArgumentException("Tasks cannot be null.");
         }
@@ -29,21 +57,21 @@ public class Storage {
             throw new IllegalArgumentException("The task list cannot contain null tasks.");
         }
 
-        Files.createDirectories(TASK_FILE.getParent());
+        Files.createDirectories(taskFile.getParent());
 
         List<String> fileLines = tasks.stream()
                 .map(Task::toStorageString)
                 .toList();
-        Path temporaryFile = Files.createTempFile(TASK_FILE.getParent(), "trybot-", ".tmp");
+        Path temporaryFile = Files.createTempFile(taskFile.getParent(), "trybot-", ".tmp");
         boolean moved = false;
         try {
             Files.write(temporaryFile, fileLines, StandardCharsets.UTF_8,
                     StandardOpenOption.TRUNCATE_EXISTING);
             try {
-                Files.move(temporaryFile, TASK_FILE, StandardCopyOption.ATOMIC_MOVE,
+                Files.move(temporaryFile, taskFile, StandardCopyOption.ATOMIC_MOVE,
                         StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException exception) {
-                Files.move(temporaryFile, TASK_FILE, StandardCopyOption.REPLACE_EXISTING);
+                Files.move(temporaryFile, taskFile, StandardCopyOption.REPLACE_EXISTING);
             }
             moved = true;
         } finally {
@@ -63,16 +91,16 @@ public class Storage {
      * @return tasks restored from disk, or an empty list when no file exists
      * @throws IOException if the task file cannot be read
      */
-    public static List<Task> loadTasks() throws IOException {
+    public List<Task> loadTasks() throws IOException {
         List<Task> tasks = new ArrayList<>();
-        if (Files.notExists(TASK_FILE)) {
+        if (Files.notExists(taskFile)) {
             return tasks;
         }
-        if (!Files.isRegularFile(TASK_FILE)) {
+        if (!Files.isRegularFile(taskFile)) {
             throw new IOException("The task data path is not a regular file.");
         }
 
-        for (String line : Files.readAllLines(TASK_FILE, StandardCharsets.UTF_8)) {
+        for (String line : Files.readAllLines(taskFile, StandardCharsets.UTF_8)) {
             Task task = parseTask(line);
             if (task != null) {
                 tasks.add(task);
