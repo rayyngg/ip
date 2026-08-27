@@ -19,6 +19,17 @@ public class Event extends Task {
     }
 
     /**
+     * Formats this event for the task data file.
+     *
+     * @return the task type, completion status, description, and event times
+     */
+    @Override
+    public String toStorageString() {
+        return "E | " + (isDone ? "1" : "0") + " | " + escapeStorageField(description)
+                + " | " + escapeStorageField(from) + " | " + escapeStorageField(to);
+    }
+
+    /**
      * Formats this task with its start and end times.
      *
      * @return formatted event task

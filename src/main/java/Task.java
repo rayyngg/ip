@@ -48,6 +48,31 @@ public class Task {
     }
 
     /**
+     * Formats this task for the task data file.
+     *
+     * @return the task type, completion status, and description
+     */
+    public String toStorageString() {
+        return "T | " + (isDone ? "1" : "0") + " | " + escapeStorageField(description);
+    }
+
+    /**
+     * Escapes characters that have a special meaning in the task data file.
+     *
+     * @param field field text to escape
+     * @return escaped field text
+     */
+    protected String escapeStorageField(String field) {
+        if (field == null) {
+            throw new IllegalArgumentException("Task data fields cannot be null.");
+        }
+        return field.replace("\\", "\\\\")
+                .replace("|", "\\|")
+                .replace("\r", "\\r")
+                .replace("\n", "\\n");
+    }
+
+    /**
      * Formats this task with its completion status.
      *
      * @return status icon and task description

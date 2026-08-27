@@ -10,6 +10,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 - Program command: `java -cp out TryBot`
 - Output comparison: exact, with CRLF normalized to LF and the final newline treated as optional
 - Execution order: top to bottom; positive and negative cases are intentionally interleaved; stop immediately after the first failure
+- Per-case setup: remove `data/trybot.txt` before each case so cases do not share persisted state. UI-012 then creates its own fixture after this reset.
 
 ## Test cases
 
@@ -508,6 +509,130 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
   ____________________________________________________________
   ____________________________________________________________
   Here are the tasks in your list:
+  ____________________________________________________________
+  ____________________________________________________________
+  Bye. Hope to see you again soon!
+  ____________________________________________________________
+  ```
+
+### UI-011 — Save task changes to disk (positive)
+
+- Aim: Verify that adding, completing, uncompleting, and deleting tasks still produce the expected confirmations while each successful task-list change is saved.
+- Command: `java -cp out TryBot`
+- Inputs:
+
+  ```text
+  todo write | file
+  mark 1
+  unmark 1
+  delete 1
+  bye
+  ```
+
+- Expected output:
+
+  ```text
+  ____________________________________________________________
+   _____             ____        _
+  |_   _| _ __ _   _ | __ )  ___ | |_
+    | |  | '__| | | ||  _ \ / _ \| __|
+    | |  | |  | |_| || |_) | (_) | |_
+    |_|  |_|   \__, ||____/ \___/ \__|
+                |___/
+  Hello! I'm TryBot.
+  What can I do for you?
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [T][ ] write | file
+  Now you have 1 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Good work!! I've marked this task as done:
+  [T][X] write | file
+  ____________________________________________________________
+  ____________________________________________________________
+  OK, I've marked this task as not done yet:
+  [T][ ] write | file
+  ____________________________________________________________
+  ____________________________________________________________
+  Noted. I've removed this task:
+  [T][ ] write | file
+  Now you have 0 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Bye. Hope to see you again soon!
+  ____________________________________________________________
+  ```
+
+  - Post-test check: `data/trybot.txt` should exist and be empty after the final delete.
+
+### UI-013 — Ignore malformed saved records (positive)
+
+- Aim: Verify that blank and malformed records are ignored while valid escaped todo, deadline, and event records are loaded with their statuses and details intact.
+- Setup command: `Set-Content -Path data/trybot.txt -Value @('', 'not a task record', 'T | 2 | invalid status', 'D | 0 | missing date', 'E | 1 | missing end | Monday', 'T | 1 | loaded \| pipe', 'D | 0 | loaded deadline | Friday', 'E | 1 | loaded event | Monday | Tuesday')`
+- Command: `java -cp out TryBot`
+- Inputs:
+
+  ```text
+  list
+  bye
+  ```
+
+- Expected output:
+
+  ```text
+  ____________________________________________________________
+   _____             ____        _
+  |_   _| _ __ _   _ | __ )  ___ | |_
+    | |  | '__| | | ||  _ \ / _ \| __|
+    | |  | |  | |_| || |_) | (_) | |_
+    |_|  |_|   \__, ||____/ \___/ \__|
+                |___/
+  Hello! I'm TryBot.
+  What can I do for you?
+  ____________________________________________________________
+  ____________________________________________________________
+  Here are the tasks in your list:
+  1.[T][X] loaded | pipe
+  2.[D][ ] loaded deadline (by: Friday)
+  3.[E][X] loaded event (from: Monday to: Tuesday)
+  ____________________________________________________________
+  ____________________________________________________________
+  Bye. Hope to see you again soon!
+  ____________________________________________________________
+  ```
+
+### UI-012 — Load saved tasks at startup (positive)
+
+- Aim: Verify that TryBot restores todo, deadline, and event tasks with their completion states from the task data file before processing the first command.
+- Setup command: `Set-Content -Path data/trybot.txt -Value @('T | 1 | loaded todo', 'D | 0 | loaded deadline | Friday', 'E | 1 | loaded event | Monday | Tuesday')`
+- Command: `java -cp out TryBot`
+- Inputs:
+
+  ```text
+  list
+  bye
+  ```
+
+- Expected output:
+
+  ```text
+  ____________________________________________________________
+   _____             ____        _
+  |_   _| _ __ _   _ | __ )  ___ | |_
+    | |  | '__| | | ||  _ \ / _ \| __|
+    | |  | |  | |_| || |_) | (_) | |_
+    |_|  |_|   \__, ||____/ \___/ \__|
+                |___/
+  Hello! I'm TryBot.
+  What can I do for you?
+  ____________________________________________________________
+  ____________________________________________________________
+  Here are the tasks in your list:
+  1.[T][X] loaded todo
+  2.[D][ ] loaded deadline (by: Friday)
+  3.[E][X] loaded event (from: Monday to: Tuesday)
   ____________________________________________________________
   ____________________________________________________________
   Bye. Hope to see you again soon!

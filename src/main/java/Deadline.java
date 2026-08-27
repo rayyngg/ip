@@ -16,6 +16,17 @@ public class Deadline extends Task {
     }
 
     /**
+     * Formats this deadline for the task data file.
+     *
+     * @return the task type, completion status, description, and deadline
+     */
+    @Override
+    public String toStorageString() {
+        return "D | " + (isDone ? "1" : "0") + " | " + escapeStorageField(description)
+                + " | " + escapeStorageField(by);
+    }
+
+    /**
      * Formats this task with its deadline.
      *
      * @return formatted deadline task
