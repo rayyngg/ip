@@ -2,6 +2,7 @@ package trybot.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Owns the ordered collection of tasks managed by TryBot.
@@ -78,5 +79,24 @@ public class TaskList {
      */
     public List<Task> toList() {
         return List.copyOf(tasks);
+    }
+
+    /**
+     * Returns tasks whose descriptions contain the supplied keyword.
+     * The comparison ignores letter case and preserves task-list order.
+     *
+     * @param keyword text to search for.
+     * @return immutable list of matching tasks
+     * @throws IllegalArgumentException if the keyword is null or blank
+     */
+    public List<Task> findByDescription(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            throw new IllegalArgumentException("The search keyword cannot be blank.");
+        }
+
+        String normalizedKeyword = keyword.trim().toLowerCase(Locale.ROOT);
+        return tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword))
+                .toList();
     }
 }
