@@ -1,6 +1,8 @@
 package trybot;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 
 import trybot.command.Command;
 import trybot.exception.TryBotException;
@@ -13,6 +15,7 @@ import trybot.ui.Ui;
  * Coordinates TryBot's user interface, parser, task list, and storage.
  */
 public class TryBot {
+    private static final String CONSOLE_SEPARATOR = "____________________________________________________________";
     private final Ui ui;
     private final Storage storage;
     private final Parser parser;
@@ -52,19 +55,39 @@ public class TryBot {
         while (ui.hasMoreCommands()) {
             String fullCommand = ui.readCommand();
             ui.showLine();
-            Command command = null;
-            try {
-                command = parser.parse(fullCommand);
-                command.execute(tasks, ui, storage);
-            } catch (TryBotException exception) {
-                ui.showError(exception.getMessage());
-            } finally {
-                ui.showLine();
-            }
+            Command command = executeCommand(fullCommand, ui);
             if (command != null && command.isExit()) {
                 break;
             }
         }
+    }
+
+    /**
+     * Processes one command for a graphical client and returns TryBot's reply.
+     *
+     * @param input command entered by the user.
+     * @return response text without the console separator.
+     */
+    public String getResponse(String input) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        Ui responseUi = new Ui(new PrintStream(output), new PrintStream(output));
+        executeCommand(input, responseUi);
+        String response = output.toString().replace("\r\n", "\n").trim();
+        int separatorIndex = response.lastIndexOf(CONSOLE_SEPARATOR);
+        return separatorIndex < 0 ? response : response.substring(0, separatorIndex).trim();
+    }
+
+    private Command executeCommand(String input, Ui targetUi) {
+        Command command = null;
+        try {
+            command = parser.parse(input);
+            command.execute(tasks, targetUi, storage);
+        } catch (TryBotException exception) {
+            targetUi.showError(exception.getMessage());
+        } finally {
+            targetUi.showLine();
+        }
+        return command;
     }
 
     /**

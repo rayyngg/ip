@@ -1,5 +1,6 @@
 package trybot.ui;
 
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Scanner;
 
@@ -18,15 +19,33 @@ public class Ui {
             + "  |_|  |_|   \\__, ||____/ \\___/ \\__|\n"
             + "              |___/\n";
     private final Scanner scanner = new Scanner(System.in);
+    private final PrintStream output;
+    private final PrintStream errorOutput;
+
+    /** Creates a UI that reads from standard input and writes to standard output. */
+    public Ui() {
+        this(System.out, System.err);
+    }
+
+    /**
+     * Creates a UI that writes messages to the supplied streams.
+     *
+     * @param output stream for normal messages.
+     * @param errorOutput stream for warnings.
+     */
+    public Ui(PrintStream output, PrintStream errorOutput) {
+        this.output = output;
+        this.errorOutput = errorOutput;
+    }
 
     /**
      * Displays TryBot's welcome message.
      */
     public void showWelcome() {
         showLine();
-        System.out.print(BANNER);
-        System.out.println("Hello! I'm TryBot.");
-        System.out.println("What can I do for you?");
+        output.print(BANNER);
+        output.println("Hello! I'm TryBot.");
+        output.println("What can I do for you?");
         showLine();
     }
 
@@ -34,7 +53,7 @@ public class Ui {
      * Displays the standard separator used between console interactions.
      */
     public void showLine() {
-        System.out.println(SEPARATOR);
+        output.println(SEPARATOR);
     }
 
     /**
@@ -69,7 +88,7 @@ public class Ui {
      * The command loop displays the final separator in its {@code finally} block.
      */
     public void showGoodbyeMessage() {
-        System.out.println("Bye. Hope to see you again soon!");
+        output.println("Bye. Hope to see you again soon!");
     }
 
     /**
@@ -78,7 +97,7 @@ public class Ui {
      * @param message user-friendly error message.
      */
     public void showError(String message) {
-        System.out.println(message);
+        output.println(message);
     }
 
     /**
@@ -88,9 +107,9 @@ public class Ui {
      * @param taskCount number of tasks after the addition.
      */
     public void showTaskAdded(Task task, int taskCount) {
-        System.out.println("Got it. I've added this task:");
-        System.out.println(task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        output.println("Got it. I've added this task:");
+        output.println(task);
+        output.println("Now you have " + taskCount + " tasks in the list.");
     }
 
     /**
@@ -99,9 +118,9 @@ public class Ui {
      * @param tasks tasks to display.
      */
     public void showTaskList(TaskList tasks) {
-        System.out.println("Here are the tasks in your list:");
+        output.println("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println((i + 1) + "." + tasks.get(i));
+            output.println((i + 1) + "." + tasks.get(i));
         }
     }
 
@@ -112,13 +131,13 @@ public class Ui {
      */
     public void showMatchingTasks(List<Task> matchingTasks) {
         if (matchingTasks.isEmpty()) {
-            System.out.println("No tasks match that keyword.");
+            output.println("No tasks match that keyword.");
             return;
         }
 
-        System.out.println("Here are the matching tasks in your list:");
+        output.println("Here are the matching tasks in your list:");
         for (int i = 0; i < matchingTasks.size(); i++) {
-            System.out.println((i + 1) + "." + matchingTasks.get(i));
+            output.println((i + 1) + "." + matchingTasks.get(i));
         }
     }
 
@@ -128,8 +147,8 @@ public class Ui {
      * @param task task that was marked as done.
      */
     public void showTaskMarkedDone(Task task) {
-        System.out.println("Good work!! I've marked this task as done:");
-        System.out.println(task);
+        output.println("Good work!! I've marked this task as done:");
+        output.println(task);
     }
 
     /**
@@ -138,8 +157,8 @@ public class Ui {
      * @param task task that was marked as not done.
      */
     public void showTaskMarkedNotDone(Task task) {
-        System.out.println("OK, I've marked this task as not done yet:");
-        System.out.println(task);
+        output.println("OK, I've marked this task as not done yet:");
+        output.println(task);
     }
 
     /**
@@ -149,16 +168,16 @@ public class Ui {
      * @param taskCount number of tasks after the deletion.
      */
     public void showTaskDeleted(Task task, int taskCount) {
-        System.out.println("Noted. I've removed this task:");
-        System.out.println(task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        output.println("Noted. I've removed this task:");
+        output.println(task);
+        output.println("Now you have " + taskCount + " tasks in the list.");
     }
 
     /**
      * Reports that the saved task list could not be loaded.
      */
     public void showLoadingError() {
-        System.err.println("Warning: TryBot could not load the saved task list. "
+        errorOutput.println("Warning: TryBot could not load the saved task list. "
                 + "Starting with an empty list.");
     }
 
@@ -166,7 +185,7 @@ public class Ui {
      * Reports that the current task list could not be saved.
      */
     public void showSavingError() {
-        System.err.println("Warning: TryBot could not save the task list. "
+        errorOutput.println("Warning: TryBot could not save the task list. "
                 + "Your changes will be lost when TryBot exits.");
     }
 }
