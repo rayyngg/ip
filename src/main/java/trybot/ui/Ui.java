@@ -173,6 +173,21 @@ public class Ui {
         output.println("Now you have " + taskCount + " tasks in the list.");
     }
 
+    /** Displays the commands available in TryBot and explains their usage. */
+    public void showHelp() {
+        output.println("Here are the commands you can use:");
+        output.println("help: help (shows this list of commands)");
+        output.println("todo: todo <task> (adds a todo task to the list)");
+        output.println("deadline: deadline <task> /by <date or time> (adds a deadline task)");
+        output.println("event: event <task> /from <start> /to <end> (adds an event task)");
+        output.println("list: list (shows all tasks)");
+        output.println("find: find <keyword> (finds tasks containing the keyword)");
+        output.println("mark: mark <number> (marks a task as done)");
+        output.println("unmark: unmark <number> (marks a task as not done)");
+        output.println("delete: delete <number> (deletes a task)");
+        output.println("bye: bye (exits TryBot)");
+    }
+
     /**
      * Reports that the saved task list could not be loaded.
      */

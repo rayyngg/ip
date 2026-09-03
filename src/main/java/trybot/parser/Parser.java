@@ -10,6 +10,7 @@ import trybot.command.DeleteCommand;
 import trybot.command.EmptyCommand;
 import trybot.command.ExitCommand;
 import trybot.command.FindCommand;
+import trybot.command.HelpCommand;
 import trybot.command.ListCommand;
 import trybot.command.MarkCommand;
 import trybot.command.UnknownCommand;
@@ -41,6 +42,9 @@ public class Parser {
         }
         if (command.equalsIgnoreCase("list")) {
             return new ListCommand();
+        }
+        if (command.equalsIgnoreCase("help")) {
+            return new HelpCommand();
         }
         if (startsWithKeyword(command, "find")) {
             return new FindCommand(parseFindKeyword(getCommandBody(command, "find")));

@@ -14,6 +14,7 @@ import trybot.command.DeleteCommand;
 import trybot.command.EmptyCommand;
 import trybot.command.ExitCommand;
 import trybot.command.FindCommand;
+import trybot.command.HelpCommand;
 import trybot.command.ListCommand;
 import trybot.command.MarkCommand;
 import trybot.command.UnknownCommand;
@@ -31,6 +32,7 @@ class ParserTest {
         assertInstanceOf(ExitCommand.class, parser.parse("bye"));
         assertInstanceOf(ExitCommand.class, parser.parse(" BYE! "));
         assertInstanceOf(ListCommand.class, parser.parse("list"));
+        assertInstanceOf(HelpCommand.class, parser.parse("HeLp"));
         assertInstanceOf(FindCommand.class, parser.parse("find book"));
         assertInstanceOf(EmptyCommand.class, parser.parse("   "));
         assertInstanceOf(EmptyCommand.class, parser.parse(null));

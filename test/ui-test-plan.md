@@ -787,3 +787,45 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
   Bye. Hope to see you again soon!
   ____________________________________________________________
   ```
+
+### UI-015 — Display command help (positive)
+
+- Aim: Verify that `help` is case-insensitive and displays usage information for every supported command.
+- Command: `java -cp out trybot.TryBot`
+- Inputs:
+
+  ```text
+  HeLp
+  bye
+  ```
+
+- Expected output:
+
+  ```text
+  ____________________________________________________________
+   _____             ____        _
+  |_   _| _ __ _   _ | __ )  ___ | |_
+    | |  | '__| | | ||  _ \ / _ \| __|
+    | |  | |  | |_| || |_) | (_) | |_
+    |_|  |_|   \__, ||____/ \___/ \__|
+                |___/
+  Hello! I'm TryBot.
+  What can I do for you?
+  ____________________________________________________________
+  ____________________________________________________________
+  Here are the commands you can use:
+  help: help (shows this list of commands)
+  todo: todo <task> (adds a todo task to the list)
+  deadline: deadline <task> /by <date or time> (adds a deadline task)
+  event: event <task> /from <start> /to <end> (adds an event task)
+  list: list (shows all tasks)
+  find: find <keyword> (finds tasks containing the keyword)
+  mark: mark <number> (marks a task as done)
+  unmark: unmark <number> (marks a task as not done)
+  delete: delete <number> (deletes a task)
+  bye: bye (exits TryBot)
+  ____________________________________________________________
+  ____________________________________________________________
+  Bye. Hope to see you again soon!
+  ____________________________________________________________
+  ```

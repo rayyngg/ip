@@ -19,7 +19,7 @@ public class UnknownCommand extends Command {
      */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws TryBotException {
-        throw new TryBotException("I do not recognise that command. Try todo, list, or bye.");
+        throw new TryBotException("I do not recognise that command. Try help to show the list of commands.");
     }
 
     /**
