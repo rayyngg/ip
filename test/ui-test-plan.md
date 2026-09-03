@@ -72,7 +72,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
   A todo needs a description. Try: todo read book.
   ____________________________________________________________
   ____________________________________________________________
-  I do not recognise that command. Try todo, list, or bye.
+  I do not recognise that command. Try help to show the list of commands.
   ____________________________________________________________
   ____________________________________________________________
   Here are the tasks in your list:

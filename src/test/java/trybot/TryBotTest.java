@@ -26,8 +26,19 @@ public class TryBotTest {
         Path dataFile = Files.createTempFile("trybot-test", ".txt");
         try {
             TryBot tryBot = new TryBot(dataFile.toString());
-            assertEquals("I do not recognise that command. Try todo, list, or bye.",
+            assertEquals("I do not recognise that command. Try help to show the list of commands.",
                     tryBot.getResponse("unknown"));
+        } finally {
+            Files.deleteIfExists(dataFile);
+        }
+    }
+
+    @Test
+    public void getResponse_byeCommand_returnsGoodbyeMessage() throws Exception {
+        Path dataFile = Files.createTempFile("trybot-test", ".txt");
+        try {
+            TryBot tryBot = new TryBot(dataFile.toString());
+            assertEquals("Bye. Hope to see you again soon!", tryBot.getResponse("BYE!"));
         } finally {
             Files.deleteIfExists(dataFile);
         }
