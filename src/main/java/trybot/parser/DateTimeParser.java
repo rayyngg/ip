@@ -130,6 +130,9 @@ public final class DateTimeParser {
      * @param hasTime whether the original value included a time.
      */
     public record ParsedDateTime(LocalDateTime dateTime, boolean hasTime) {
+        /**
+         * Creates a parsed date-time value after validating the date-time component.
+         */
         public ParsedDateTime {
             if (dateTime == null) {
                 throw new IllegalArgumentException("A parsed date or time cannot be null.");

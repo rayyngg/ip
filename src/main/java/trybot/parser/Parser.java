@@ -12,8 +12,8 @@ import trybot.command.ExitCommand;
 import trybot.command.FindCommand;
 import trybot.command.ListCommand;
 import trybot.command.MarkCommand;
-import trybot.command.UnmarkCommand;
 import trybot.command.UnknownCommand;
+import trybot.command.UnmarkCommand;
 import trybot.exception.TryBotException;
 
 /**

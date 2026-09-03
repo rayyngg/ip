@@ -86,7 +86,7 @@ class DateTimeParserTest {
     }
 
     @Test
-    void formatForDisplay_orStorage_nullValue_throwsIllegalArgumentException() {
+    void formatForDisplayOrStorage_nullValue_exceptionThrown() {
         assertAll(
                 () -> assertThrows(IllegalArgumentException.class,
                         () -> DateTimeParser.formatForDisplay(null)),
