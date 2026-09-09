@@ -10,6 +10,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import trybot.task.Deadline;
 import trybot.task.Event;
@@ -99,21 +101,17 @@ public class Storage {
      * @throws IOException if the task file cannot be read
      */
     public List<Task> loadTasks() throws IOException {
-        List<Task> tasks = new ArrayList<>();
         if (Files.notExists(taskFile)) {
-            return tasks;
+            return new ArrayList<>();
         }
         if (!Files.isRegularFile(taskFile)) {
             throw new IOException("The task data path is not a regular file.");
         }
 
-        for (String line : Files.readAllLines(taskFile, StandardCharsets.UTF_8)) {
-            Task task = parseTask(line);
-            if (task != null) {
-                tasks.add(task);
-            }
-        }
-        return tasks;
+        return Files.readAllLines(taskFile, StandardCharsets.UTF_8).stream()
+                .map(Storage::parseTask)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
