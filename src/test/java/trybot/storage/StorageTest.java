@@ -58,6 +58,7 @@ class StorageTest {
                 "",
                 "not a task record",
                 "T | 2 | invalid status",
+                "T | 0 | extra field | ignored",
                 "D | 0 | missing date",
                 "E | 1 | missing end | Monday",
                 "T | 1 | valid todo",

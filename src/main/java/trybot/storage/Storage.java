@@ -20,6 +20,10 @@ import trybot.task.Todo;
  * Saves TryBot's task list to a file on disk.
  */
 public class Storage {
+    private static final String TODO_TYPE = "T";
+    private static final String DEADLINE_TYPE = "D";
+    private static final String EVENT_TYPE = "E";
+    private static final String COMPLETED_STATUS = "1";
     private final Path taskFile;
 
     /**
@@ -132,48 +136,102 @@ public class Storage {
             return null;
         }
 
+        SavedTaskFields savedTask = decodeTaskFields(fields);
+        if (savedTask == null || !isValidStatus(savedTask.status())) {
+            return null;
+        }
+
+        Task task;
+        try {
+            task = createTask(fields, savedTask);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
+
+        if (task != null && savedTask.status().equals(COMPLETED_STATUS)) {
+            task.markAsDone();
+        }
+        return task;
+    }
+
+    /**
+     * Decodes the common fields in a saved task record.
+     *
+     * @param fields raw fields from a saved record.
+     * @return decoded common fields, or null when a field cannot be decoded
+     */
+    private static SavedTaskFields decodeTaskFields(List<String> fields) {
         String taskType = unescapeField(fields.get(0));
         String status = unescapeField(fields.get(1));
         String description = unescapeField(fields.get(2));
         if (taskType == null || status == null || description == null) {
             return null;
         }
-        taskType = taskType.trim().replace("\uFEFF", "").toUpperCase(Locale.ROOT);
-        status = status.trim();
-        description = description.trim();
-        if (!(status.equals("0") || status.equals("1"))) {
-            return null;
-        }
+        return new SavedTaskFields(taskType.trim().replace("\uFEFF", "").toUpperCase(Locale.ROOT),
+                status.trim(), description.trim());
+    }
 
-        Task task;
-        try {
-            switch (taskType) {
-                case "T":
-                    task = fields.size() == 3 && !description.isEmpty() ? new Todo(description) : null;
-                    break;
-                case "D":
-                    String by = fields.size() == 4 ? unescapeField(fields.get(3)) : null;
-                    task = by != null && !description.isEmpty() && !by.trim().isEmpty()
-                            ? new Deadline(description, by.trim()) : null;
-                    break;
-                case "E":
-                    String from = fields.size() == 5 ? unescapeField(fields.get(3)) : null;
-                    String to = fields.size() == 5 ? unescapeField(fields.get(4)) : null;
-                    task = from != null && to != null && !description.isEmpty()
-                            && !from.trim().isEmpty() && !to.trim().isEmpty()
-                            ? new Event(description, from.trim(), to.trim()) : null;
-                    break;
-                default:
-                    task = null;
-            }
-        } catch (IllegalArgumentException exception) {
-            return null;
-        }
+    /**
+     * Checks whether a saved status is one of the supported values.
+     *
+     * @param status decoded completion status.
+     * @return true when the status represents an incomplete or completed task
+     */
+    private static boolean isValidStatus(String status) {
+        return status.equals("0") || status.equals(COMPLETED_STATUS);
+    }
 
-        if (task != null && status.equals("1")) {
-            task.markAsDone();
+    /**
+     * Creates a task from decoded common fields and its type-specific fields.
+     *
+     * @param fields raw fields from a saved record.
+     * @param savedTask decoded common fields.
+     * @return the constructed task, or null when the record shape is invalid
+     */
+    private static Task createTask(List<String> fields, SavedTaskFields savedTask) {
+        switch (savedTask.taskType()) {
+            case TODO_TYPE:
+                return fields.size() == 3 && !savedTask.description().isEmpty()
+                        ? new Todo(savedTask.description()) : null;
+            case DEADLINE_TYPE:
+                return createDeadline(fields, savedTask.description());
+            case EVENT_TYPE:
+                return createEvent(fields, savedTask.description());
+            default:
+                return null;
         }
-        return task;
+    }
+
+    /**
+     * Creates a deadline from its saved fields when all fields are valid.
+     *
+     * @param fields raw fields from a saved record.
+     * @param description decoded task description.
+     * @return the constructed deadline, or null when the record is invalid
+     */
+    private static Task createDeadline(List<String> fields, String description) {
+        String by = fields.size() == 4 ? unescapeField(fields.get(3)) : null;
+        return by != null && !description.isEmpty() && !by.trim().isEmpty()
+                ? new Deadline(description, by.trim()) : null;
+    }
+
+    /**
+     * Creates an event from its saved fields when all fields are valid.
+     *
+     * @param fields raw fields from a saved record.
+     * @param description decoded task description.
+     * @return the constructed event, or null when the record is invalid
+     */
+    private static Task createEvent(List<String> fields, String description) {
+        String from = fields.size() == 5 ? unescapeField(fields.get(3)) : null;
+        String to = fields.size() == 5 ? unescapeField(fields.get(4)) : null;
+        boolean hasValidDetails = from != null && to != null
+                && !description.isEmpty() && !from.trim().isEmpty() && !to.trim().isEmpty();
+        return hasValidDetails ? new Event(description, from.trim(), to.trim()) : null;
+    }
+
+    /** Holds the common fields decoded from one saved task record. */
+    private record SavedTaskFields(String taskType, String status, String description) {
     }
 
     /**
