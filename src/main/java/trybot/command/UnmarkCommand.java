@@ -36,6 +36,8 @@ public class UnmarkCommand extends Command {
         }
 
         Task task = tasks.get(taskNumber - 1);
+        // The task-list invariant guarantees that a valid index yields a task.
+        assert task != null;
         task.markAsNotDone();
         saveTasks(tasks, ui, storage);
         ui.showTaskMarkedNotDone(task);

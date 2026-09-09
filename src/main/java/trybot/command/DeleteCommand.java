@@ -36,6 +36,8 @@ public class DeleteCommand extends Command {
         }
 
         Task removedTask = tasks.remove(taskNumber - 1);
+        // Removing a validated index must return the task that was displayed to the user.
+        assert removedTask != null;
         saveTasks(tasks, ui, storage);
         ui.showTaskDeleted(removedTask, tasks.size());
     }
