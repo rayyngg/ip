@@ -58,6 +58,7 @@ class StorageTest {
                 "",
                 "not a task record",
                 "T | 2 | invalid status",
+                "T | 0 | extra field | ignored",
                 "D | 0 | missing date",
                 "E | 1 | missing end | Monday",
                 "T | 1 | valid todo",
@@ -70,5 +71,20 @@ class StorageTest {
         assertEquals("[T][X] valid todo", loaded.get(0).toString());
         assertEquals("[D][ ] valid deadline (by: Friday)", loaded.get(1).toString());
         assertEquals("[E][X] valid event (from: Monday to: Tuesday)", loaded.get(2).toString());
+    }
+
+    @Test
+    void loadTasks_blankDescriptions_ignoresThoseRecords() throws IOException {
+        Path taskFile = temporaryDirectory.resolve("tasks.txt");
+        Files.write(taskFile, List.of(
+                "T | 0 |   ",
+                "D | 0 |   | Friday",
+                "E | 0 |   | Monday | Tuesday",
+                "T | 0 | usable todo"));
+
+        List<Task> loaded = new Storage(taskFile).loadTasks();
+
+        assertEquals(1, loaded.size());
+        assertEquals("[T][ ] usable todo", loaded.get(0).toString());
     }
 }

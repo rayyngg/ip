@@ -37,6 +37,17 @@ public class Parser {
         if (command.isEmpty()) {
             return new EmptyCommand();
         }
+        return parseCommand(command);
+    }
+
+    /**
+     * Routes a non-blank command to the parser for its command category.
+     *
+     * @param command trimmed user input.
+     * @return executable command
+     * @throws TryBotException if a command has malformed structured arguments
+     */
+    private Command parseCommand(String command) throws TryBotException {
         if (command.equalsIgnoreCase("bye") || command.equalsIgnoreCase("bye!")) {
             return new ExitCommand();
         }
@@ -46,6 +57,17 @@ public class Parser {
         if (command.equalsIgnoreCase("help")) {
             return new HelpCommand();
         }
+        return parseTaskCommand(command);
+    }
+
+    /**
+     * Parses commands that operate on or create tasks.
+     *
+     * @param command trimmed user input.
+     * @return executable task command
+     * @throws TryBotException if a command has malformed structured arguments
+     */
+    private Command parseTaskCommand(String command) throws TryBotException {
         if (startsWithKeyword(command, "find")) {
             return new FindCommand(parseFindKeyword(getCommandBody(command, "find")));
         }
