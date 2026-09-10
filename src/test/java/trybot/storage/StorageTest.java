@@ -39,6 +39,10 @@ class StorageTest {
         todo.markAsDone();
         Deadline deadline = new Deadline("submit report", "2024-02-29 1830");
         Event event = new Event("team meeting", "Monday", "Tuesday");
+        todo.addTag("reading");
+        deadline.addTag("school");
+        deadline.addTag("urgent");
+        event.addTag("work");
         List<Task> original = List.of(todo, deadline, event);
 
         storage.saveTasks(original);
@@ -48,7 +52,10 @@ class StorageTest {
         assertEquals(original.get(0).toString(), loaded.get(0).toString());
         assertEquals(original.get(1).toStorageString(), loaded.get(1).toStorageString());
         assertEquals(original.get(2).toStorageString(), loaded.get(2).toStorageString());
-        assertEquals("T | 1 | read \\\\ book \\| notes\\nnow", Files.readAllLines(taskFile).get(0));
+        assertEquals(List.of("reading"), loaded.get(0).getTags());
+        assertEquals(List.of("school", "urgent"), loaded.get(1).getTags());
+        assertEquals(List.of("work"), loaded.get(2).getTags());
+        assertEquals("T | 1 | read \\\\ book \\| notes\\nnow | reading", Files.readAllLines(taskFile).get(0));
     }
 
     @Test
@@ -58,7 +65,6 @@ class StorageTest {
                 "",
                 "not a task record",
                 "T | 2 | invalid status",
-                "T | 0 | extra field | ignored",
                 "D | 0 | missing date",
                 "E | 1 | missing end | Monday",
                 "T | 1 | valid todo",
@@ -86,5 +92,16 @@ class StorageTest {
 
         assertEquals(1, loaded.size());
         assertEquals("[T][ ] usable todo", loaded.get(0).toString());
+    }
+
+    @Test
+    void loadTasks_legacyRecordsWithoutTags_remainSupported() throws IOException {
+        Path taskFile = temporaryDirectory.resolve("tasks.txt");
+        Files.write(taskFile, List.of("T | 0 | legacy todo"));
+
+        List<Task> loaded = new Storage(taskFile).loadTasks();
+
+        assertEquals(List.of(), loaded.get(0).getTags());
+        assertEquals("[T][ ] legacy todo", loaded.get(0).toString());
     }
 }

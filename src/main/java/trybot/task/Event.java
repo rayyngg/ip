@@ -113,7 +113,7 @@ public class Event extends Task {
     public String toStorageString() {
         return "E | " + (isDone ? "1" : "0") + " | " + escapeStorageField(description)
                 + " | " + escapeStorageField(getFromStorageValue())
-                + " | " + escapeStorageField(getToStorageValue());
+                + " | " + escapeStorageField(getToStorageValue()) + getTagsForStorage();
     }
 
     /**

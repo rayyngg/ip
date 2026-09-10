@@ -13,6 +13,8 @@ import trybot.command.FindCommand;
 import trybot.command.HelpCommand;
 import trybot.command.ListCommand;
 import trybot.command.MarkCommand;
+import trybot.command.TagCommand;
+import trybot.command.TagDeleteCommand;
 import trybot.command.UnknownCommand;
 import trybot.command.UnmarkCommand;
 import trybot.exception.TryBotException;
@@ -74,6 +76,12 @@ public class Parser {
         if (startsWithKeyword(command, "mark")) {
             return new MarkCommand(parseTaskNumber(getCommandBody(command, "mark"), "mark"));
         }
+        if (startsWithKeyword(command, "tag")) {
+            return parseTag(getCommandBody(command, "tag"));
+        }
+        if (startsWithKeyword(command, "tagdel")) {
+            return new TagDeleteCommand(parseTaskNumber(getCommandBody(command, "tagdel"), "tagdel"));
+        }
         if (startsWithKeyword(command, "unmark")) {
             return new UnmarkCommand(parseTaskNumber(getCommandBody(command, "unmark"), "unmark"));
         }
@@ -90,6 +98,21 @@ public class Parser {
             return new AddEventCommand(parseEvent(getCommandBody(command, "event")));
         }
         return new UnknownCommand();
+    }
+
+    /** Parses a tag command containing one task number and one tag name. */
+    private Command parseTag(String body) throws TryBotException {
+        String[] commandParts = body.split("\\s+", 2);
+        if (body.isBlank() || commandParts.length < 2 || commandParts[1].isBlank()) {
+            throw new TryBotException("Tag needs a task number and tag name. Example: tag 1 important.");
+        }
+        int taskNumber;
+        try {
+            taskNumber = Integer.parseInt(commandParts[0]);
+        } catch (NumberFormatException exception) {
+            throw new TryBotException("The task number must be a whole number. Example: tag 1 important.");
+        }
+        return new TagCommand(taskNumber, commandParts[1].trim());
     }
 
     /**
