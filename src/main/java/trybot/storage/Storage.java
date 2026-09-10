@@ -173,6 +173,9 @@ public class Storage {
         if (task != null && status.equals("1")) {
             task.markAsDone();
         }
+
+        // A record accepted by this method must produce a task with usable core data.
+        assert task == null || task.getDescription() != null && !task.getDescription().isBlank();
         return task;
     }
 
