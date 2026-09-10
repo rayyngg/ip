@@ -820,10 +820,76 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
   event: event <task> /from <start> /to <end> (adds an event task)
   list: list (shows all tasks)
   find: find <keyword> (finds tasks containing the keyword)
+  tag: tag <number> <tag name> (attaches a tag to a task)
   mark: mark <number> (marks a task as done)
   unmark: unmark <number> (marks a task as not done)
   delete: delete <number> (deletes a task)
   bye: bye (exits TryBot)
+  ____________________________________________________________
+  ____________________________________________________________
+  Bye. Hope to see you again soon!
+  ____________________________________________________________
+  ```
+
+### UI-016 — Tag tasks and preserve tags across listing (positive)
+
+- Aim: Verify that a tag can be attached to a task and appears beside the task in the list.
+- Command: `java -cp out trybot.TryBot`
+- Inputs:
+
+  ```text
+  todo submit report
+  deadline revise report /by Friday
+  event review /from Monday /to Tuesday
+  tag 1 urgent
+  tag 2 school
+  tag 3 work
+  list
+  bye
+  ```
+
+- Expected output:
+
+  ```text
+  ____________________________________________________________
+   _____             ____        _
+  |_   _| _ __ _   _ | __ )  ___ | |_
+    | |  | '__| | | ||  _ \ / _ \| __|
+    | |  | |  | |_| || |_) | (_) | |_
+    |_|  |_|   \__, ||____/ \___/ \__|
+                |___/
+  Hello! I'm TryBot.
+  What can I do for you?
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [T][ ] submit report
+  Now you have 1 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [D][ ] revise report (by: Friday)
+  Now you have 2 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Got it. I've added this task:
+  [E][ ] review (from: Monday to: Tuesday)
+  Now you have 3 tasks in the list.
+  ____________________________________________________________
+  ____________________________________________________________
+  Tag Created for Task 1: urgent
+  ____________________________________________________________
+  ____________________________________________________________
+  Tag Created for Task 2: school
+  ____________________________________________________________
+  ____________________________________________________________
+  Tag Created for Task 3: work
+  ____________________________________________________________
+  ____________________________________________________________
+  Here are the tasks in your list:
+  1.[T][ ] submit report #urgent
+  2.[D][ ] revise report #school (by: Friday)
+  3.[E][ ] review #work (from: Monday to: Tuesday)
   ____________________________________________________________
   ____________________________________________________________
   Bye. Hope to see you again soon!

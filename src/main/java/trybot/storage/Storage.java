@@ -149,6 +149,9 @@ public class Storage {
         if (task != null && savedTask.status().equals(COMPLETED_STATUS)) {
             task.markAsDone();
         }
+        if (task != null) {
+            addSavedTags(task, fields, savedTask.taskType());
+        }
 
         // A record accepted by this method must produce a task with usable core data.
         assert task == null || task.getDescription() != null && !task.getDescription().isBlank();
@@ -192,7 +195,7 @@ public class Storage {
     private static Task createTask(List<String> fields, SavedTaskFields savedTask) {
         switch (savedTask.taskType()) {
             case TODO_TYPE:
-                return fields.size() == 3 && !savedTask.description().isEmpty()
+                return fields.size() >= 3 && !savedTask.description().isEmpty()
                         ? new Todo(savedTask.description()) : null;
             case DEADLINE_TYPE:
                 return createDeadline(fields, savedTask.description());
@@ -211,7 +214,7 @@ public class Storage {
      * @return the constructed deadline, or null when the record is invalid
      */
     private static Task createDeadline(List<String> fields, String description) {
-        String by = fields.size() == 4 ? unescapeField(fields.get(3)) : null;
+        String by = fields.size() >= 4 ? unescapeField(fields.get(3)) : null;
         return by != null && !description.isEmpty() && !by.trim().isEmpty()
                 ? new Deadline(description, by.trim()) : null;
     }
@@ -224,11 +227,28 @@ public class Storage {
      * @return the constructed event, or null when the record is invalid
      */
     private static Task createEvent(List<String> fields, String description) {
-        String from = fields.size() == 5 ? unescapeField(fields.get(3)) : null;
-        String to = fields.size() == 5 ? unescapeField(fields.get(4)) : null;
+        String from = fields.size() >= 5 ? unescapeField(fields.get(3)) : null;
+        String to = fields.size() >= 5 ? unescapeField(fields.get(4)) : null;
         boolean hasValidDetails = from != null && to != null
                 && !description.isEmpty() && !from.trim().isEmpty() && !to.trim().isEmpty();
         return hasValidDetails ? new Event(description, from.trim(), to.trim()) : null;
+    }
+
+    /** Restores optional tag fields from a saved task record. */
+    private static void addSavedTags(Task task, List<String> fields, String taskType) {
+        int firstTagIndex = switch (taskType) {
+            case TODO_TYPE -> 3;
+            case DEADLINE_TYPE -> 4;
+            case EVENT_TYPE -> 5;
+            default -> fields.size();
+        };
+        for (int i = firstTagIndex; i < fields.size(); i++) {
+            String tag = unescapeField(fields.get(i));
+            if (tag == null || tag.isBlank()) {
+                continue;
+            }
+            task.addTag(tag.trim());
+        }
     }
 
     /** Holds the common fields decoded from one saved task record. */

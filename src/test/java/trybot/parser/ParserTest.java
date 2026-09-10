@@ -17,6 +17,7 @@ import trybot.command.FindCommand;
 import trybot.command.HelpCommand;
 import trybot.command.ListCommand;
 import trybot.command.MarkCommand;
+import trybot.command.TagCommand;
 import trybot.command.UnknownCommand;
 import trybot.command.UnmarkCommand;
 import trybot.exception.TryBotException;
@@ -46,6 +47,7 @@ class ParserTest {
         assertInstanceOf(AddDeadlineCommand.class, parser.parse("deadline report /by Friday"));
         assertInstanceOf(AddEventCommand.class, parser.parse("event meeting /from Monday /to Tuesday"));
         assertInstanceOf(MarkCommand.class, parser.parse("mark 2"));
+        assertInstanceOf(TagCommand.class, parser.parse("tag 2 urgent"));
         assertInstanceOf(UnmarkCommand.class, parser.parse("unmark 2"));
         assertInstanceOf(DeleteCommand.class, parser.parse("delete 2"));
     }
@@ -71,6 +73,8 @@ class ParserTest {
         assertThrows(TryBotException.class, () -> parser.parse("event meeting /from Monday"));
         assertThrows(TryBotException.class, () -> parser.parse("mark"));
         assertThrows(TryBotException.class, () -> parser.parse("mark abc"));
+        assertThrows(TryBotException.class, () -> parser.parse("tag 1"));
+        assertThrows(TryBotException.class, () -> parser.parse("tag abc urgent"));
         assertThrows(TryBotException.class, () -> parser.parse("delete 1 2"));
         assertThrows(TryBotException.class, () -> parser.parse("find"));
         assertThrows(TryBotException.class, () -> parser.parse("find   "));

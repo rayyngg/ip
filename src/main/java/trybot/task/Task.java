@@ -1,11 +1,16 @@
 package trybot.task;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Represents a task stored by TryBot.
  */
 public class Task {
     protected String description;
     protected boolean isDone;
+    private final List<String> tags;
 
     /**
      * Creates a task that is initially not done.
@@ -15,6 +20,7 @@ public class Task {
     public Task(String description) {
         this.description = description;
         this.isDone = false;
+        this.tags = new ArrayList<>();
     }
 
     /**
@@ -50,12 +56,47 @@ public class Task {
     }
 
     /**
+     * Returns the tags attached to this task in the order they were added.
+     *
+     * @return immutable list of tag names
+     */
+    public List<String> getTags() {
+        return Collections.unmodifiableList(tags);
+    }
+
+    /**
+     * Attaches a tag to this task unless it is already present.
+     *
+     * @param tagName tag name to attach.
+     * @throws IllegalArgumentException if the tag name is blank
+     */
+    public void addTag(String tagName) {
+        if (tagName == null || tagName.isBlank()) {
+            throw new IllegalArgumentException("A tag name cannot be blank.");
+        }
+        String trimmedTag = tagName.trim();
+        if (!tags.contains(trimmedTag)) {
+            tags.add(trimmedTag);
+        }
+    }
+
+    /**
+     * Returns tags formatted for display.
+     *
+     * @return a space-separated sequence of hashtag-prefixed tag names
+     */
+    protected String getTagsForDisplay() {
+        return tags.stream().map(tag -> "#" + tag).reduce("", (left, right) -> left + " " + right);
+    }
+
+    /**
      * Formats this task for the task data file.
      *
      * @return the task type, completion status, and description
      */
     public String toStorageString() {
-        return "T | " + (isDone ? "1" : "0") + " | " + escapeStorageField(description);
+        return "T | " + (isDone ? "1" : "0") + " | " + escapeStorageField(description)
+                + getTagsForStorage();
     }
 
     /**
@@ -81,6 +122,15 @@ public class Task {
      */
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        return "[" + getStatusIcon() + "] " + description + getTagsForDisplay();
+    }
+
+    /**
+     * Formats the optional tags for the task data file.
+     *
+     * @return zero or more escaped storage fields
+     */
+    protected String getTagsForStorage() {
+        return tags.stream().map(tag -> " | " + escapeStorageField(tag)).reduce("", String::concat);
     }
 }

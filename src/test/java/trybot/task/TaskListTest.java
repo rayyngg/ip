@@ -87,4 +87,17 @@ class TaskListTest {
         assertThrows(IllegalArgumentException.class, () -> tasks.findByDescription("   "));
         assertEquals(List.of(), tasks.findByDescription("missing"));
     }
+
+    @Test
+    void task_addTag_formatsTagsAndAvoidsDuplicates() {
+        Task task = new Todo("read book");
+
+        task.addTag("  urgent ");
+        task.addTag("urgent");
+        task.addTag("school");
+
+        assertEquals(List.of("urgent", "school"), task.getTags());
+        assertEquals("[T][ ] read book #urgent #school", task.toString());
+        assertThrows(IllegalArgumentException.class, () -> task.addTag("   "));
+    }
 }

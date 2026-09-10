@@ -173,6 +173,16 @@ public class Ui {
         output.println("Now you have " + taskCount + " tasks in the list.");
     }
 
+    /**
+     * Displays a confirmation after attaching a tag.
+     *
+     * @param taskNumber one-based task number.
+     * @param tagName tag that was attached.
+     */
+    public void showTagCreated(int taskNumber, String tagName) {
+        output.println("Tag Created for Task " + taskNumber + ": " + tagName);
+    }
+
     /** Displays the commands available in TryBot and explains their usage. */
     public void showHelp() {
         output.println("Here are the commands you can use:");
@@ -182,6 +192,7 @@ public class Ui {
         output.println("event: event <task> /from <start> /to <end> (adds an event task)");
         output.println("list: list (shows all tasks)");
         output.println("find: find <keyword> (finds tasks containing the keyword)");
+        output.println("tag: tag <number> <tag name> (attaches a tag to a task)");
         output.println("mark: mark <number> (marks a task as done)");
         output.println("unmark: unmark <number> (marks a task as not done)");
         output.println("delete: delete <number> (deletes a task)");

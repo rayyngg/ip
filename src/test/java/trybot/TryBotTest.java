@@ -43,4 +43,19 @@ public class TryBotTest {
             Files.deleteIfExists(dataFile);
         }
     }
+
+    @Test
+    public void getResponse_tagCommand_tagsTaskAndListsTag() throws Exception {
+        Path dataFile = Files.createTempFile("trybot-test", ".txt");
+        try {
+            TryBot tryBot = new TryBot(dataFile.toString());
+            tryBot.getResponse("todo submit report");
+
+            assertEquals("Tag Created for Task 1: urgent", tryBot.getResponse("tag 1 urgent"));
+            assertEquals("Here are the tasks in your list:\n1.[T][ ] submit report #urgent",
+                    tryBot.getResponse("list"));
+        } finally {
+            Files.deleteIfExists(dataFile);
+        }
+    }
 }
