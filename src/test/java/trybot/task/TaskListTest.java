@@ -99,5 +99,9 @@ class TaskListTest {
         assertEquals(List.of("urgent", "school"), task.getTags());
         assertEquals("[T][ ] read book #urgent #school", task.toString());
         assertThrows(IllegalArgumentException.class, () -> task.addTag("   "));
+
+        task.clearTags();
+        assertEquals(List.of(), task.getTags());
+        assertEquals("[T][ ] read book", task.toString());
     }
 }

@@ -14,6 +14,7 @@ import trybot.command.HelpCommand;
 import trybot.command.ListCommand;
 import trybot.command.MarkCommand;
 import trybot.command.TagCommand;
+import trybot.command.TagDeleteCommand;
 import trybot.command.UnknownCommand;
 import trybot.command.UnmarkCommand;
 import trybot.exception.TryBotException;
@@ -77,6 +78,9 @@ public class Parser {
         }
         if (startsWithKeyword(command, "tag")) {
             return parseTag(getCommandBody(command, "tag"));
+        }
+        if (startsWithKeyword(command, "tagdel")) {
+            return new TagDeleteCommand(parseTaskNumber(getCommandBody(command, "tagdel"), "tagdel"));
         }
         if (startsWithKeyword(command, "unmark")) {
             return new UnmarkCommand(parseTaskNumber(getCommandBody(command, "unmark"), "unmark"));

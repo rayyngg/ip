@@ -821,6 +821,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
   list: list (shows all tasks)
   find: find <keyword> (finds tasks containing the keyword)
   tag: tag <number> <tag name> (attaches a tag to a task)
+  tagdel: tagdel <number> (removes all tags from a task)
   mark: mark <number> (marks a task as done)
   unmark: unmark <number> (marks a task as not done)
   delete: delete <number> (deletes a task)
@@ -844,6 +845,7 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
   tag 1 urgent
   tag 2 school
   tag 3 work
+  tagdel 1
   list
   bye
   ```
@@ -886,8 +888,11 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
   Tag Created for Task 3: work
   ____________________________________________________________
   ____________________________________________________________
+  Tags Deleted for Task 1
+  ____________________________________________________________
+  ____________________________________________________________
   Here are the tasks in your list:
-  1.[T][ ] submit report #urgent
+  1.[T][ ] submit report
   2.[D][ ] revise report #school (by: Friday)
   3.[E][ ] review #work (from: Monday to: Tuesday)
   ____________________________________________________________

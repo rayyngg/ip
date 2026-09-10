@@ -80,6 +80,11 @@ public class Task {
         }
     }
 
+    /** Removes every tag attached to this task. */
+    public void clearTags() {
+        tags.clear();
+    }
+
     /**
      * Returns tags formatted for display.
      *

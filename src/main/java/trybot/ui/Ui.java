@@ -183,6 +183,15 @@ public class Ui {
         output.println("Tag Created for Task " + taskNumber + ": " + tagName);
     }
 
+    /**
+     * Displays a confirmation after removing tags from a task.
+     *
+     * @param taskNumber one-based task number.
+     */
+    public void showTagsDeleted(int taskNumber) {
+        output.println("Tags Deleted for Task " + taskNumber);
+    }
+
     /** Displays the commands available in TryBot and explains their usage. */
     public void showHelp() {
         output.println("Here are the commands you can use:");
@@ -193,6 +202,7 @@ public class Ui {
         output.println("list: list (shows all tasks)");
         output.println("find: find <keyword> (finds tasks containing the keyword)");
         output.println("tag: tag <number> <tag name> (attaches a tag to a task)");
+        output.println("tagdel: tagdel <number> (removes all tags from a task)");
         output.println("mark: mark <number> (marks a task as done)");
         output.println("unmark: unmark <number> (marks a task as not done)");
         output.println("delete: delete <number> (deletes a task)");
