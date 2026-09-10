@@ -28,6 +28,9 @@ public class Deadline extends Task {
         this.byText = parsedBy == null ? trimmedBy : null;
         this.byDateTime = parsedBy == null ? null : parsedBy.dateTime();
         this.byHasTime = parsedBy != null && parsedBy.hasTime();
+
+        // A deadline is represented by exactly one of legacy text or a parsed date-time.
+        assert (byText == null) != (byDateTime == null);
     }
 
     /**

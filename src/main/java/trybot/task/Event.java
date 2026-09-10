@@ -40,6 +40,10 @@ public class Event extends Task {
         this.toDateTime = parsedTo == null ? null : parsedTo.dateTime();
         this.fromHasTime = parsedFrom != null && parsedFrom.hasTime();
         this.toHasTime = parsedTo != null && parsedTo.hasTime();
+
+        // Each endpoint must have exactly one representation after construction.
+        assert (fromText == null) != (fromDateTime == null);
+        assert (toText == null) != (toDateTime == null);
     }
 
     /**

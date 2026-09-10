@@ -28,6 +28,9 @@ public class TaskList {
             throw new IllegalArgumentException("A task list cannot contain null tasks.");
         }
         this.tasks = new ArrayList<>(tasks);
+
+        // The list invariant established above must also hold for the private copy.
+        assert this.tasks.stream().allMatch(task -> task != null);
     }
 
     /**
@@ -41,6 +44,9 @@ public class TaskList {
             throw new IllegalArgumentException("A task list cannot contain null tasks.");
         }
         tasks.add(task);
+
+        // A successful add must leave the newest list entry equal to the supplied task.
+        assert tasks.get(tasks.size() - 1) == task;
     }
 
     /**
@@ -78,7 +84,10 @@ public class TaskList {
      * @return immutable copy of the current tasks
      */
     public List<Task> toList() {
-        return List.copyOf(tasks);
+        List<Task> snapshot = List.copyOf(tasks);
+        assert snapshot.size() == tasks.size();
+        assert snapshot.stream().allMatch(task -> task != null);
+        return snapshot;
     }
 
     /**

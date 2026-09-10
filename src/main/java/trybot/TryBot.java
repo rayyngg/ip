@@ -44,6 +44,8 @@ public class TryBot {
             ui.showLoadingError();
             loadedTasks = new TaskList();
         }
+        // Both loading paths must initialise the task list before the application can run.
+        assert loadedTasks != null;
         tasks = loadedTasks;
     }
 
@@ -81,6 +83,8 @@ public class TryBot {
         Command command = null;
         try {
             command = parser.parse(input);
+            // Parser.parse returns an executable command for every input, including invalid input.
+            assert command != null;
             command.execute(tasks, targetUi, storage);
         } catch (TryBotException exception) {
             targetUi.showError(exception.getMessage());
