@@ -146,7 +146,8 @@ public class MainWindowTest {
             assertTrue(send.isDisabled());
             assertTrue(root.lookup("#suggestions").isDisabled());
             Label farewell = (Label) messages.getChildren().getLast().lookup("#dialog");
-            assertEquals("Thank you for sharing your to-do list with me! See you soon.", farewell.getText());
+            assertEquals("You did great today! Thanks for sharing your to-do list with me. See you soon!",
+                    farewell.getText());
             assertEquals("Closing in 5 seconds. See you soon!", ((Label) root.lookup("#inputHint")).getText());
         });
         assertFalse(closed.await(2, TimeUnit.SECONDS), "The farewell must remain visible before closing.");

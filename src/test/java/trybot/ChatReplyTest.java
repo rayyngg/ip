@@ -25,11 +25,12 @@ public class ChatReplyTest {
             assertTrue(reply.hasError());
             assertFalse(reply.hasWarning());
             assertFalse(reply.isExit());
-            assertTrue(reply.text().contains("Let's try again."));
+            assertTrue(reply.text().contains("No worries!"));
+            assertTrue(reply.text().contains("You've got this!"));
         }
         ChatReply reply = bot.getChatReply("list");
         assertFalse(reply.hasError());
-        assertTrue(reply.text().contains("Your list is a fresh start."));
+        assertTrue(reply.text().contains("Your list is a fresh start—"));
     }
 
     @Test
@@ -51,9 +52,11 @@ public class ChatReplyTest {
     public void getChatReply_completionAndReopening_updatesStatusWithEncouragement() {
         TryBot bot = new TryBot(directory.resolve("tasks.txt").toString());
         bot.getChatReply("todo read");
-        assertEquals("Nice work! That's one more thing done:\n[T][X] read",
+        assertEquals("Fantastic job! You did it—one more thing checked off:\n[T][X] read\n"
+                + "You should feel proud! Keep that momentum going!",
                 bot.getChatReply("mark 1").text());
-        assertEquals("No rush. I've put this back on your to-do list:\n[T][ ] read",
+        assertEquals("No worries—every step counts. I've put this back on your to-do list:\n[T][ ] read\n"
+                + "You can come back to it whenever you're ready!",
                 bot.getChatReply("unmark 1").text());
     }
 
@@ -73,7 +76,7 @@ public class ChatReplyTest {
         ChatReply reply = bot.getChatReply("todo keep in memory");
         assertTrue(reply.hasWarning());
         assertFalse(reply.hasError());
-        assertTrue(reply.text().contains("could not save"));
+        assertTrue(reply.text().contains("couldn't save"));
         assertTrue(bot.getChatReply("list").text().contains("1. [T][ ] keep in memory"));
     }
 
@@ -83,6 +86,6 @@ public class ChatReplyTest {
         ChatReply reply = bot.getChatReply(" BYE! ");
         assertTrue(reply.isExit());
         assertFalse(reply.hasError());
-        assertEquals("Thank you for sharing your to-do list with me! See you soon.", reply.text());
+        assertEquals("You did great today! Thanks for sharing your to-do list with me. See you soon!", reply.text());
     }
 }
