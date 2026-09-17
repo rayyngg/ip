@@ -18,6 +18,9 @@ public class Task {
      * @param description text describing the task.
      */
     public Task(String description) {
+        if (description == null || description.isBlank()) {
+            throw new IllegalArgumentException("A task description cannot be blank.");
+        }
         this.description = description;
         this.isDone = false;
         this.tags = new ArrayList<>();

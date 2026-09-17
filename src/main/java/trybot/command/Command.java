@@ -36,7 +36,7 @@ public abstract class Command {
     protected void saveTasks(TaskList tasks, Ui ui, Storage storage) {
         try {
             storage.saveTasks(tasks.toList());
-        } catch (java.io.IOException exception) {
+        } catch (java.io.IOException | SecurityException exception) {
             ui.showSavingError();
         }
     }

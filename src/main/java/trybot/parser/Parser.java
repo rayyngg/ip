@@ -39,6 +39,9 @@ public class Parser {
         if (command.isEmpty()) {
             return new EmptyCommand();
         }
+        if (containsControlCharacter(command)) {
+            throw new TryBotException("A command cannot contain control characters.");
+        }
         return parseCommand(command);
     }
 
@@ -125,7 +128,7 @@ public class Parser {
     private ParsedDeadline parseDeadline(String body) throws TryBotException {
         String lowerCaseBody = body.toLowerCase(Locale.ROOT);
         int byIndex = lowerCaseBody.indexOf("/by");
-        if (byIndex < 0) {
+        if (byIndex < 0 || lowerCaseBody.indexOf("/by", byIndex + 3) >= 0) {
             throw new TryBotException("A deadline needs /by followed by a date or time. "
                     + "Example: deadline report /by Friday.");
         }
@@ -150,7 +153,9 @@ public class Parser {
         String lowerCaseBody = body.toLowerCase(Locale.ROOT);
         int fromIndex = lowerCaseBody.indexOf("/from");
         int toIndex = lowerCaseBody.indexOf("/to", fromIndex + "/from".length());
-        if (fromIndex < 0 || toIndex < 0) {
+        boolean hasDuplicateFrom = fromIndex >= 0 && lowerCaseBody.indexOf("/from", fromIndex + 5) >= 0;
+        boolean hasDuplicateTo = toIndex >= 0 && lowerCaseBody.indexOf("/to", toIndex + 3) >= 0;
+        if (fromIndex < 0 || toIndex < 0 || hasDuplicateFrom || hasDuplicateTo || toIndex < fromIndex) {
             throw new TryBotException("An event needs /from and /to time details. "
                     + "Example: event meeting /from Monday /to Tuesday.");
         }
@@ -180,6 +185,9 @@ public class Parser {
             throw new TryBotException(displayName + " needs one task number. Example: " + commandName + " 1.");
         }
 
+        if (!commandParts[0].matches("\\d+")) {
+            throw new TryBotException("The task number must be a whole number. Example: " + commandName + " 1.");
+        }
         try {
             return Integer.parseInt(commandParts[0]);
         } catch (NumberFormatException exception) {
@@ -242,6 +250,12 @@ public class Parser {
             body = body.substring(1).trim();
         }
         return body;
+    }
+
+    /** Returns whether input contains characters that cannot safely be treated as command text. */
+    private boolean containsControlCharacter(String command) {
+        return command.chars().anyMatch(character -> Character.isISOControl(character)
+                && !Character.isWhitespace(character));
     }
 
     /**

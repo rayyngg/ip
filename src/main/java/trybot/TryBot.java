@@ -42,7 +42,7 @@ public class TryBot {
         TaskList loadedTasks;
         try {
             loadedTasks = new TaskList(storage.loadTasks());
-        } catch (IOException exception) {
+        } catch (IOException | RuntimeException exception) {
             ui.showLoadingError();
             loadedTasks = new TaskList();
         }

@@ -29,7 +29,12 @@ public abstract class AddCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws TryBotException {
         Task task = createTask();
-        tasks.add(task);
+        try {
+            tasks.add(task);
+        } catch (IllegalArgumentException exception) {
+            throw new TryBotException(exception.getMessage() == null
+                    ? "That task could not be added." : exception.getMessage());
+        }
         saveTasks(tasks, ui, storage);
         ui.showTaskAdded(task, tasks.size());
     }

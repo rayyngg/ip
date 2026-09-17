@@ -43,6 +43,10 @@ public class TaskList {
         if (task == null) {
             throw new IllegalArgumentException("A task list cannot contain null tasks.");
         }
+        if (tasks.stream().anyMatch(existingTask -> taskSignature(existingTask)
+                .equals(taskSignature(task)))) {
+            throw new IllegalArgumentException("A task with the same details already exists.");
+        }
         tasks.add(task);
 
         // A successful add must leave the newest list entry equal to the supplied task.
@@ -107,5 +111,10 @@ public class TaskList {
         return tasks.stream()
                 .filter(task -> task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword))
                 .toList();
+    }
+
+    /** Returns task data with completion status removed for duplicate detection. */
+    private String taskSignature(Task task) {
+        return task.toStorageString().replaceFirst("\\| [01] \\|", "| 0 |");
     }
 }

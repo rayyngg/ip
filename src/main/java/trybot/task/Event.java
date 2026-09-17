@@ -24,13 +24,21 @@ public class Event extends Task {
      */
     public Event(String description, String from, String to) {
         super(description);
+        if (from == null || from.isBlank() || to == null || to.isBlank()) {
+            throw new IllegalArgumentException("An event needs both a start and end time.");
+        }
         if (description == null || description.isBlank()) {
             throw new IllegalArgumentException("An event description cannot be blank.");
         }
         DateTimeParser.ParsedDateTime parsedFrom = DateTimeParser.parseOrNull(from);
         DateTimeParser.ParsedDateTime parsedTo = DateTimeParser.parseOrNull(to);
-        if (parsedFrom != null && parsedTo != null && parsedFrom.dateTime().isAfter(parsedTo.dateTime())) {
-            throw new IllegalArgumentException("An event cannot end before it starts.");
+        if (parsedFrom != null && parsedTo != null) {
+            if (parsedFrom.dateTime().isAfter(parsedTo.dateTime())) {
+                throw new IllegalArgumentException("An event cannot end before it starts.");
+            }
+            if (parsedFrom.dateTime().equals(parsedTo.dateTime())) {
+                throw new IllegalArgumentException("An event must end after it starts.");
+            }
         }
         String trimmedFrom = from.trim();
         String trimmedTo = to.trim();

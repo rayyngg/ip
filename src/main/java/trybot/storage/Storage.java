@@ -41,7 +41,7 @@ public class Storage {
      * @param filePath path to the task file.
      */
     public Storage(String filePath) {
-        this(Path.of(filePath));
+        this(filePath == null ? null : Path.of(filePath));
     }
 
     /**
@@ -70,12 +70,13 @@ public class Storage {
             throw new IllegalArgumentException("The task list cannot contain null tasks.");
         }
 
-        Files.createDirectories(taskFile.getParent());
+        Path parentDirectory = taskFile.toAbsolutePath().getParent();
+        Files.createDirectories(parentDirectory);
 
         List<String> fileLines = tasks.stream()
                 .map(Task::toStorageString)
                 .toList();
-        Path temporaryFile = Files.createTempFile(taskFile.getParent(), "trybot-", ".tmp");
+        Path temporaryFile = Files.createTempFile(parentDirectory, "trybot-", ".tmp");
         boolean moved = false;
         try {
             Files.write(temporaryFile, fileLines, StandardCharsets.UTF_8,
@@ -113,9 +114,18 @@ public class Storage {
         }
 
         return Files.readAllLines(taskFile, StandardCharsets.UTF_8).stream()
-                .map(Storage::parseTask)
+                .map(Storage::parseTaskSafely)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /** Parses one record without allowing one corrupt line to abort the whole load. */
+    private static Task parseTaskSafely(String line) {
+        try {
+            return parseTask(line);
+        } catch (RuntimeException exception) {
+            return null;
+        }
     }
 
     /**

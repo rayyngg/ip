@@ -27,7 +27,7 @@ public class AddTodoCommand extends AddCommand {
      */
     @Override
     protected Task createTask() throws TryBotException {
-        if (description.isEmpty()) {
+        if (description == null || description.isBlank()) {
             throw new TryBotException("A todo needs a description. Try: todo read book.");
         }
         return new Todo(description);

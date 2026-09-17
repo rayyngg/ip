@@ -20,6 +20,9 @@ public class Deadline extends Task {
      */
     public Deadline(String description, String by) {
         super(description);
+        if (by == null || by.isBlank()) {
+            throw new IllegalArgumentException("A deadline date or time cannot be blank.");
+        }
         if (description == null || description.isBlank()) {
             throw new IllegalArgumentException("A deadline description cannot be blank.");
         }

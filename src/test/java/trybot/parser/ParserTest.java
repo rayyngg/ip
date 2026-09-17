@@ -103,6 +103,26 @@ class ParserTest {
         assertEquals("Find needs a keyword. Example: find book.", exception.getMessage());
     }
 
+    @Test
+    void parse_duplicateStructuredParameters_rejectsAmbiguousCommands() {
+        assertThrows(TryBotException.class,
+                () -> parser.parse("deadline report /by Friday /by Monday"));
+        assertThrows(TryBotException.class,
+                () -> parser.parse("event meeting /from Monday /from Tuesday /to Wednesday"));
+        assertThrows(TryBotException.class,
+                () -> parser.parse("event meeting /from Monday /to Tuesday /to Wednesday"));
+    }
+
+    @Test
+    void parse_controlCharacters_rejectsUnsafeInput() {
+        assertThrows(TryBotException.class, () -> parser.parse("todo read\u0000book"));
+    }
+
+    @Test
+    void parse_signedTaskNumber_rejectsNonWholeNumberSyntax() {
+        assertThrows(TryBotException.class, () -> parser.parse("mark +1"));
+    }
+
     /**
      * Adapts the checked parser contract for the one valid command that is
      * intentionally validated later, during command execution.

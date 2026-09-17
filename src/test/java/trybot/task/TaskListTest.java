@@ -104,4 +104,23 @@ class TaskListTest {
         assertEquals(List.of(), task.getTags());
         assertEquals("[T][ ] read book", task.toString());
     }
+
+    @Test
+    void taskList_addDuplicateDetails_rejectsDuplicateRegardlessOfStatus() {
+        TaskList tasks = new TaskList(List.of(new Todo("read book")));
+        Todo duplicate = new Todo("read book");
+        duplicate.markAsDone();
+
+        assertThrows(IllegalArgumentException.class, () -> tasks.add(duplicate));
+        assertEquals(1, tasks.size());
+    }
+
+    @Test
+    void taskConstructors_rejectMissingRequiredFields() {
+        assertThrows(IllegalArgumentException.class, () -> new Todo(null));
+        assertThrows(IllegalArgumentException.class, () -> new Deadline("report", null));
+        assertThrows(IllegalArgumentException.class, () -> new Event("meeting", "Monday", null));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Event("meeting", "2024-01-01 0900", "2024-01-01 0900"));
+    }
 }
