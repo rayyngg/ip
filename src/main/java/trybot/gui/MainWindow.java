@@ -1,5 +1,6 @@
 package trybot.gui;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -8,6 +9,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import trybot.TryBot;
 import trybot.ui.ChatReply;
 
@@ -15,6 +17,8 @@ import trybot.ui.ChatReply;
  * Keeps the conversation, command suggestions, and input controls in sync.
  */
 public class MainWindow {
+    private static final Duration GOODBYE_DELAY = Duration.seconds(5);
+
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -29,6 +33,17 @@ public class MainWindow {
     private Label inputHint;
 
     private TryBot tryBot;
+    private final Runnable exitAction;
+
+    /** Creates a controller that closes the JavaFX application after its farewell. */
+    public MainWindow() {
+        this(Platform::exit);
+    }
+
+    /** Allows tests to observe shutdown without terminating their JavaFX runtime. */
+    MainWindow(Runnable exitAction) {
+        this.exitAction = exitAction;
+    }
 
     /**
      * Connects the window to the application logic and welcomes the user.
@@ -53,7 +68,7 @@ public class MainWindow {
     @FXML
     private void handleUserInput() {
         String input = userInput.getText().trim();
-        if (input.isEmpty() || tryBot == null) {
+        if (input.isEmpty() || tryBot == null || userInput.isDisabled()) {
             return;
         }
 
@@ -70,10 +85,13 @@ public class MainWindow {
         userInput.requestFocus();
 
         if (reply.isExit()) {
-            // Leave the goodbye visible so closing the conversation does not feel abrupt.
             userInput.setDisable(true);
             suggestions.setDisable(true);
-            inputHint.setText("See you soon! You can close this window whenever you're ready.");
+            inputHint.setText("Closing in 5 seconds. See you soon!");
+            // A JavaFX timer leaves the farewell visible without freezing the window.
+            PauseTransition goodbyePause = new PauseTransition(GOODBYE_DELAY);
+            goodbyePause.setOnFinished(event -> exitAction.run());
+            goodbyePause.play();
         }
     }
 

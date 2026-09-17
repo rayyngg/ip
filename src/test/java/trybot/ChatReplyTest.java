@@ -83,6 +83,6 @@ public class ChatReplyTest {
         ChatReply reply = bot.getChatReply(" BYE! ");
         assertTrue(reply.isExit());
         assertFalse(reply.hasError());
-        assertTrue(reply.text().startsWith("See you soon!"));
+        assertEquals("Thank you for sharing your to-do list with me! See you soon.", reply.text());
     }
 }

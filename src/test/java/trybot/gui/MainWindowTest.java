@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.imageio.ImageIO;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -50,8 +51,11 @@ public class MainWindowTest {
 
     @Test
     public void conversation_editSuggestResizeAndExit_preservesUsableControls() throws Exception {
+        CountDownLatch closed = new CountDownLatch(1);
+        AtomicLong goodbyeStarted = new AtomicLong();
         runOnFxThread(() -> {
             FXMLLoader loader = new FXMLLoader(MainWindow.class.getResource("/view/MainWindow.fxml"));
+            loader.setControllerFactory(type -> new MainWindow(closed::countDown));
             root = loader.load();
             MainWindow controller = loader.getController();
             controller.setTryBot(new TryBot(directory.resolve("tasks.txt").toString()));
@@ -136,11 +140,20 @@ public class MainWindowTest {
             }
 
             input.setText("bye");
+            goodbyeStarted.set(System.nanoTime());
             send.fire();
             assertTrue(input.isDisabled());
             assertTrue(send.isDisabled());
             assertTrue(root.lookup("#suggestions").isDisabled());
+            Label farewell = (Label) messages.getChildren().getLast().lookup("#dialog");
+            assertEquals("Thank you for sharing your to-do list with me! See you soon.", farewell.getText());
+            assertEquals("Closing in 5 seconds. See you soon!", ((Label) root.lookup("#inputHint")).getText());
         });
+        assertFalse(closed.await(2, TimeUnit.SECONDS), "The farewell must remain visible before closing.");
+        runOnFxThread(() -> assertTrue(root.isVisible(), "JavaFX must stay responsive during the delay."));
+        assertTrue(closed.await(6, TimeUnit.SECONDS), "The application should close automatically.");
+        assertTrue(System.nanoTime() - goodbyeStarted.get() >= TimeUnit.MILLISECONDS.toNanos(4900),
+                "The farewell should be displayed for five seconds.");
     }
 
     private static void saveSnapshot(BorderPane root, int width) throws Exception {

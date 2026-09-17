@@ -90,7 +90,7 @@ public class ChatUi extends Ui {
 
     @Override
     public void showGoodbyeMessage() {
-        output.println("See you soon! We'll take the next task one step at a time.");
+        output.println("Thank you for sharing your to-do list with me! See you soon.");
     }
 
     public String getText() {
