@@ -6,11 +6,11 @@ This file defines the scripted console UI tests used by the `test-ui` project sk
 
 - Working directory: repository root
 - Java requirement: Java 25
-- Setup command: `javac -d out (Get-ChildItem -Recurse src/main/java -Filter *.java | Select-Object -ExpandProperty FullName)`
+- Setup command: `javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src/main/java -Filter *.java | Where-Object { $_.Directory.Name -ne 'gui' } | Select-Object -ExpandProperty FullName)`
 - Program command: `java -cp out trybot.TryBot`
 - Output comparison: exact, with CRLF normalized to LF and the final newline treated as optional
 - Execution order: top to bottom; positive and negative cases are intentionally interleaved; stop immediately after the first failure
-- Per-case setup: remove `data/trybot.txt` before each case so cases do not share persisted state. UI-012 then creates its own fixture after this reset.
+- Per-case setup: preserve any existing `data/trybot.txt` outside the test run and restore it afterwards. Remove the test data file before each case so cases do not share persisted state. UI-012 and UI-013 create their fixtures after this reset.
 
 ## Test cases
 

@@ -9,6 +9,8 @@ import trybot.exception.TryBotException;
 import trybot.parser.Parser;
 import trybot.storage.Storage;
 import trybot.task.TaskList;
+import trybot.ui.ChatReply;
+import trybot.ui.ChatUi;
 import trybot.ui.Ui;
 
 /**
@@ -77,6 +79,19 @@ public class TryBot {
         String response = output.toString().replace("\r\n", "\n").trim();
         int separatorIndex = response.lastIndexOf(CONSOLE_SEPARATOR);
         return separatorIndex < 0 ? response : response.substring(0, separatorIndex).trim();
+    }
+
+    /**
+     * Executes one graphical command with friendly text and explicit error and exit states.
+     *
+     * @param input command entered by the user.
+     * @return reply for the conversation view.
+     */
+    public ChatReply getChatReply(String input) {
+        ChatUi responseUi = new ChatUi();
+        Command command = executeCommand(input, responseUi);
+        return new ChatReply(responseUi.getText(), responseUi.hasError(), responseUi.hasWarning(),
+                command != null && command.isExit());
     }
 
     private Command executeCommand(String input, Ui targetUi) {
